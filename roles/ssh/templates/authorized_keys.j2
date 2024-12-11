@@ -1,0 +1,8 @@
+{% for key in ssh_keys %}
+{% if key.command is defined %}{{ key.command }} {% endif %}{{ lookup('file', 'keyfiles/' + key.name + '.pub') }}
+{% endfor %}
+{% if additional_ssh_keys is defined %}
+{% for key in additional_ssh_keys %}
+{% if key.command is defined %}{{ key.command }} {% endif %}{{ lookup('file', 'keyfiles/' + key.name + '.pub') }}
+{% endfor %}
+{% endif %}

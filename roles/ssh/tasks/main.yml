@@ -1,0 +1,44 @@
+---
+- name: SSH-Schlüsseldatei generieren
+  template:
+    src: authorized_keys.j2
+    dest: /root/.ssh/authorized_keys
+
+- name: SSH-Dämon Passwortanmeldung abschalten
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^[#]?PasswordAuthentication
+    line: "PasswordAuthentication no"
+  notify: reload ssh
+
+- name: Permit root login only with pub-/priv-key auth
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^[#]?PermitRootLogin
+    line: "PermitRootLogin without-password"
+  notify:
+    - reload ssh
+
+- name: Let PAM Module (in general) anabled
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^[#]?UsePAM
+    line: "UsePAM yes"
+  notify:
+    - reload ssh
+
+- name: Disable PAM Auth
+  lineinfile:
+    dest: /etc/pam.d/sshd
+    regexp: ^auth
+    line: "auth required pam_deny.so"
+  notify:
+    - reload ssh
+
+- name: Disable ChallengeResponseAuthentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^[#]?ChallengeResponseAuthentication
+    line: "ChallengeResponseAuthentication no"
+  notify:
+    - reload ssh

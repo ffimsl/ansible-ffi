@@ -1,0 +1,99 @@
+---
+# Allgemeine Konfigurationen für alle Server
+
+- name: Enable syntax highlighting in vim by default
+  lineinfile:
+    dest: ~/.vimrc
+    regexp: '^syntax '
+    line: 'syntax on'
+    owner: root
+    group: root
+    mode: 0644
+    create: yes
+
+- name: Update .bash_profile file
+  template:
+    src: bash_profile.j2
+    dest: ~/.bash_profile
+
+- name: Flush all handlers
+  meta: flush_handlers
+
+- name: Eventuelles CDROM-Repo von der Installation entfernen
+  lineinfile:
+    dest: /etc/apt/sources.list
+    state: absent
+    regexp: 'cdrom'
+
+- name: install common packages
+  apt:
+    name: ['vim', 'wget', 'vnstat', 'tmux', 'pastebinit', 'htop', 'jnettop', 'iotop', 'tcpdump', 'screen', 'strace', 'socat', 'dnsutils', 'host', 'ifupdown',
+      'apt-transport-https', 'tshark', 'dwdiff', 'molly-guard', 'git', 'iperf3', 'mtr-tiny', 'dhcpdump', 'dhcping', 'irqbalance', 'build-essential', 'ethtool']
+    update_cache: yes
+
+- name: uninstall unneeded packages
+  apt:
+    pkg: ['rpcbind']
+    update_cache: yes
+    state: absent
+
+- name: Unterstützung für deutsche Sprache aktivieren
+  locale_gen: name=de_DE.UTF-8 state=present
+
+- name: "Get all files in /etc/logrotate.d/"
+  raw: find /etc/logrotate.d/ -type f
+  register: logrotate_files
+  check_mode: no
+  changed_when: False
+
+- name: "Update logrotate cycle in /etc/logrotate.d/"
+  replace:
+    dest: "{{ item }}"
+    regexp: 'daily|weekly|monthly'
+    replace: '{{ logrotate.cycle }}'
+  with_items: "{{ logrotate_files.stdout_lines }}"
+
+- name: "Update logrotate count in /etc/logrotate.d/"
+  replace:
+    dest: "{{ item }}"
+    regexp: 'rotate[ \t]+[0-9]+'
+    replace: 'rotate {{ logrotate.count }}'
+  with_items: "{{ logrotate_files.stdout_lines }}"
+
+- name: Logrotate Rotationszyklus und Anzahl anpassen
+  template:
+    src: logrotate.conf.j2
+    dest: /etc/logrotate.conf
+  when: logrotate is defined
+
+- name: Logrotate konfigurieren für btmp
+  template:
+    src: logrotate-btmp.j2
+    dest: /etc/logrotate.d/btmp
+  when: logrotate is defined
+
+- name: Logrotate konfigurieren für wtmp
+  template:
+    src: logrotate-wtmp.j2
+    dest: /etc/logrotate.d/wtmp
+  when: logrotate is defined
+
+- name: Prüfe ob journald benutzt wird
+  stat:
+    path: /etc/systemd/journald.conf
+  register: journald_conf
+
+- name: journald-Logging zeitlich beschränken
+  lineinfile:
+    dest: /etc/systemd/journald.conf
+    regexp: "^[#]?MaxRetentionSec"
+    line: "MaxRetentionSec={{ logrotate.cycle | lower | replace('daily',1) | replace('weekly',7) | replace('monthly',30) | replace('yearly',365) | int * logrotate.count | int }}day"
+  when: journald_conf.stat.exists
+  notify: restart journald
+
+- name: vnstat Bandbreiten limit auf 1000 Mbit erhöhen.
+  lineinfile:
+    dest: /etc/vnstat.conf
+    regexp: "^MaxBandwidth"
+    line: "MaxBandwidth 1000"
+    state: present

@@ -1,0 +1,17 @@
+FLASK_ENV="production"
+SQLALCHEMY_DATABASE_URI="mysql+pymysql://{{ uffd.db_user }}:{{ uffd.db_password }}@127.0.0.1/{{ uffd.db_name }}?charset=utf8mb4"
+SECRET_KEY='{{ uffd.secret_key }}'
+MAIL_SERVER='{{ uffd.mail_server }}'
+MAIL_PORT={{ uffd.mail_port }}
+MAIL_USERNAME='{{ uffd.mail_username }}'
+MAIL_PASSWORD='{{ uffd.mail_password }}'
+MAIL_USE_STARTTLS={{ uffd.mail_use_starttls }}
+MAIL_FROM_ADDRESS='{{ uffd.mail_from_address }}'
+MFA_RP_NAME='{{ uffd.mfa_rp_name }}'
+FOOTER_LINKS=[{% for link in uffd.footer_links %}{"url": "{{ link.url }}", "title": "{{ link.title }}"}{% if not loop.last %},{% endif %}{% endfor %}]
+LOGIN_BANNER='{{ uffd.login_banner }}'
+BRANDING_LOGO_URL='{{ uffd.branding_logo_url }}'
+SITE_TITLE='{{ uffd.site_title }}'
+ORGANISATION_NAME='{{ uffd.organisation_name }}'
+ORGANISATION_CONTACT='{{ uffd.organisation_contact }}'
+WELCOME_TEXT='{{ uffd.welcome_text }}'

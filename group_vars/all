@@ -1,0 +1,30 @@
+# Globale Variablen für alle Server
+ssh_keys:
+  - name: "parad0x"
+  - name: "descilla"
+  - name: "mpw"
+  - name: "corny"
+  - name: "wurmi"
+  - name: "robwei"
+  - name: "jbergner"
+#  - name: "musteradmin"
+#    command: "no-agent-forwarding,no-port-forwarding,no-pty,no-user-rc,no-X11-forwarding"
+
+# Zusätzliche Keys können mit additional_ssh_keys in der group_vars oder host_vars zu einzelnen Systemen hinzugefügt werden.
+#additional_ssh_keys:
+#  - name: "musteradmin"
+#    command: "no-agent-forwarding,no-port-forwarding,no-pty,no-user-rc,no-X11-forwarding"
+
+logrotate:
+  cycle: daily
+  count: 3
+
+orga:
+  name: "Förderverein Freie Infrastruktur e.V."
+  kurzname: "ffi"
+  email: vorstand@infrastruktur.ms
+  adminmail: adminteam@infrastruktur.ms
+  domain: infrastruktur.ms
+
+server_besitzer: "{{ orga.name }}"
+#server_aufgabe: "Super-Server für super wichtige Aufgaben"

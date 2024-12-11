@@ -1,0 +1,99 @@
+---
+- name: Add CCCV repository key
+  shell: |
+    curl -s https://packages.cccv.de/docs/cccv-archive-key.gpg | gpg --dearmor -o /usr/share/keyrings/cccv.gpg
+  args:
+    creates: /usr/share/keyrings/cccv.gpg
+
+- name: Add CCCV repository to sources list
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/cccv.gpg, arch=all] https://packages.cccv.de/uffd {{ ansible_distribution_release }} main"
+    filename: cccv
+
+- name: Add Caddy repository key
+  shell: |
+    curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/gpg.key | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+
+- name: Add Caddy repository to sources list
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
+    filename: caddy
+
+- name: Install UFFD and dependencies
+  apt:
+    name:
+      - uffd
+      - python3-pymysql
+      - mariadb-server
+      - caddy
+    state: present
+    update_cache: yes
+
+- name: Configure MySQL database for uffd
+  mysql_db:
+    name: "{{ uffd.db_name }}"
+    encoding: utf8mb4
+    collation: utf8mb4_nopad_bin
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock  # Setze den Unix-Socket, falls nötig
+    login_password: ""  # Leere Passwort, wenn `auth_socket` verwendet wird
+  become: yes
+  become_user: root  # Ansible wird sich als root anmelden
+  register: mysql_db_result
+
+- name: Create MySQL user for uffd
+  mysql_user:
+    name: "{{ uffd.db_user }}"
+    password: "{{ uffd.db_password }}"
+    priv: "{{ uffd.db_name }}.*:ALL"
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock  # Setze den Unix-Socket, falls nötig
+    login_password: ""  # Leere Passwort, wenn `auth_socket` verwendet wird
+  become: yes
+  become_user: root  # Ansible wird sich als root anmelden
+
+- name: Configure uffd application
+  template:
+    src: uffd.cfg.j2
+    dest: /etc/uffd/uffd.cfg
+    mode: '0644'
+  notify: Restart uwsgi
+
+- name: Enable uwsgi http-socket
+  lineinfile:
+    dest: /etc/uwsgi/apps-available/uffd.ini
+    regexp: '^http-socket '
+    line: 'http-socket = 127.0.0.1:8080'
+  notify: Restart uwsgi
+
+- name: Run uffd db upgrade
+  command: uffd-admin db upgrade
+  when: mysql_db_result.changed
+
+- name: Create uffd groups and roles
+  command:
+    cmd: "{{ item }}"
+  with_items:
+    - "uffd-admin group create 'uffd_access' --description 'Access to Single-Sign-On and Selfservice'"
+    - "uffd-admin group create 'uffd_admin' --description 'Admin access to uffd'"
+    - "uffd-admin role create 'uffd_admin' --add-group 'uffd_admin' --add-group 'uffd_access'"
+  when: mysql_db_result.changed
+
+- name: Create initial admin user
+  command: >
+    uffd-admin user create '{{ uffd.admin_user }}' --password '{{ uffd.admin_password }}'
+    --mail '{{ uffd.admin_email }}' --displayname '{{ uffd.admin_displayname }}' --add-role 'uffd_admin'
+  when: mysql_db_result.changed
+
+- name: create Caddyfile
+  template:
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart caddy

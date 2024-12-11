@@ -1,0 +1,8 @@
+- import_playbook: all.yml
+
+- hosts: uffdsso
+  vars_files:
+    - passwords.yml
+  remote_user: root
+  roles:
+    - { role: uffd_setup, tags: "uffd_setup" }

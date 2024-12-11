@@ -1,0 +1,7 @@
+- name: reload resolv config
+  command: resolvconf -u
+
+- name: restart journald
+  systemd:
+    name: systemd-journald
+    state: restarted

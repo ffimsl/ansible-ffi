@@ -1,0 +1,4 @@
+vault_pass.txt
+# ignore files of Jetbrains InteliJ IDEA
+/.idea
+/*.iml 
