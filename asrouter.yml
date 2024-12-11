@@ -1,0 +1,8 @@
+- import_playbook: all.yml
+
+- hosts: asrouter
+  vars_files:
+    - passwords.yml
+  remote_user: root
+  roles:
+    - { role: bird_as, tags: "bird_as" }

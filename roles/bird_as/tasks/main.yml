@@ -1,0 +1,16 @@
+---
+
+- name: bird6_bgp.conf Konfigruation
+  ansible.builtin.template:
+    src: bird6_bgp.conf.j2
+    dest: /etc/bird/bird6_bgp.conf
+
+- name: bird6_filter.conf Konfigruation
+  ansible.builtin.template:
+    src: bird6_filter.conf.j2
+    dest: /etc/bird/bird6_filter.conf
+
+- name: bird6.conf Konfigruation
+  ansible.builtin.template:
+    src: bird6.conf.j2
+    dest: /etc/bird/bird6.conf
