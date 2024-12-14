@@ -5,8 +5,18 @@ template bgp default_ibgp {
         direct;
         next hop self;
         bfd graceful;
+	rr client;
         import filter internal_in;
         export filter internal_out;
+}
+
+template bgp default_ibgp_downstreams {
+        local as {{ as_number }};
+        direct;
+        next hop self;
+        bfd graceful;
+        import filter own_subnet_morespec;
+        export filter own_subnet_morespec;
 }
 
 template bgp default_ebgp_ixp {
@@ -33,7 +43,9 @@ template bgp default_ebgp_transit {
 protocol bgp ibgp_cix_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp {
         source address {{ as_v6.ibgp_cix_address_dict[ibgp_partner]['source'] }};
         neighbor {{ as_v6.ibgp_cix_address_dict[ibgp_partner]['address'] }} as {{ as_number }};
+{% if as_v6.ibgp_cix_address_dict[ibgp_partner]['interface'] is defined %}
         interface "{{ as_v6.ibgp_cix_address_dict[ibgp_partner]['interface'] }}";
+{% endif %}
 }
 {% endfor %}{% endif %}
 
@@ -41,9 +53,25 @@ protocol bgp ibgp_cix_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp
 protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp {
         source address {{ as_v6.ibgp_direct_dict[ibgp_partner]['source'] }};
         neighbor {{ as_v6.ibgp_direct_dict[ibgp_partner]['address'] }} as {{ as_number }};
+{% if as_v6.ibgp_direct_dict[ibgp_partner]['interface'] is defined %}
         interface "{{ as_v6.ibgp_direct_dict[ibgp_partner]['interface'] }}";
+{% endif %}
 }
 {% endfor %}{% endif %}
+
+#iBGP Downstreams
+{% for community in as_tunnel_endpoints %}
+#{{ community }}
+{% for peer in as_tunnel_endpoints[community]["peers"] %}
+protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }} from default_ibgp_downstreams {
+        source address {{ as_v6.gre_tunnel_transfer_network | ansible.utils.ipsubnet(127, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('address') }};
+        neighbor {{ as_v6.gre_tunnel_transfer_network | ansible.utils.ipsubnet(127, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('peer') }} as {{ as_tunnel_endpoints[community]["peers"][peer]["remote_as"] }};
+}
+
+{% endfor %}
+
+{% endfor %}
+
 
 # eBGP
 # IXPs

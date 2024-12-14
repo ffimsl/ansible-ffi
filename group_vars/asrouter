@@ -5,3 +5,12 @@ as_number: 209894
 as_prefix:
   v6: "2a14:440::/30"
   v4: "45.154.111.0/24"
+
+as_tunnel_endpoints:
+  "Freifunk Muensterland":
+    id: 1
+    peers:
+     "rowe":
+       peer_id: 0
+       gre6_target: "2a01:4f8:171:124a::2"
+       remote_as: 209894

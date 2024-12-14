@@ -54,6 +54,7 @@
   register: birdc_configure
   when:
     - not ansible_check_mode
+    - (bird_filter_config.changed or bird_bgp_config.changed or bird_config.changed)
     - '"Configuration OK" in birdc_check_out.stdout'
   changed_when: '"Reconfigured" in birdc_configure.stdout or "Reconfiguration in progress" in birdc_configure.stdout'
   failed_when: '"Reconfigured" not in birdc_configure.stdout and "Reconfiguration in progress" not in birdc_configure.stdout'
@@ -72,6 +73,7 @@
   register: birdc6_configure
   when:
     - not ansible_check_mode
+    - (bird6_filter_config.changed or bird6_bgp_config.changed or bird6_config.changed)
     - '"Configuration OK" in birdc6_check_out.stdout'
   changed_when: '"Reconfigured" in birdc6_configure.stdout or "Reconfiguration in progress" in birdc6_configure.stdout'
   failed_when: '"Reconfigured" not in birdc6_configure.stdout and "Reconfiguration in progress" not in birdc6_configure.stdout'

@@ -5,4 +5,5 @@
     - passwords.yml
   remote_user: root
   roles:
+    - { role: gre6_tunnel, tags: "gre6_tunnel" }
     - { role: bird_as, tags: "bird_as" }

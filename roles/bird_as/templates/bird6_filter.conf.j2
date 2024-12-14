@@ -6,7 +6,10 @@ filter own_subnet_morespec {
 }
 
 filter own_subnet {
-	if net = {{ as_v6.as_prefix_host_spec }} then accept;
+	if source = RTS_STATIC then {
+		if net = {{ as_v6.as_prefix_host_spec }} then accept;
+		if net = {{ as_prefix.v6 }} then accept;
+        }
 	reject;
 }
 
@@ -113,6 +116,24 @@ filter ixp_in {
 filter cix_ixp_in {
   reject_bogon_asns();
   reject_bogon_prefixes();
+  reject_default_route();
+  honor_graceful_shutdown();
+  accept;
+}
+
+filter downstream_in {
+  reject_bogon_asns();
+  reject_bogon_prefixes();
+#  reject_transit_paths();
+  reject_default_route();
+  honor_graceful_shutdown();
+  accept;
+}
+
+filter downstream_out {
+  reject_bogon_asns();
+  reject_bogon_prefixes();
+#  reject_transit_paths();
   reject_default_route();
   honor_graceful_shutdown();
   accept;

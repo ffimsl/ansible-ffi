@@ -1,0 +1,8 @@
+---
+
+- name: tunnel-Interfaces Konfigruation
+  ansible.builtin.template:
+    src: 95-tunnel-interfaces.cfg.j2
+    dest: /etc/network/interfaces.d/95-tunnel-interfaces.cfg
+  register: tunnel_interfaces_config
+

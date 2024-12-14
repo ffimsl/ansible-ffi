@@ -113,6 +113,24 @@ filter ixp_in {
   accept;
 }
 
+filter downstream_in {
+  reject_bogon_asns();
+  reject_bogon_prefixes();
+#  reject_transit_paths();
+  reject_default_route(); #Das bald erlauben
+  honor_graceful_shutdown();
+  accept;
+}
+
+filter downstream_out {
+  reject_bogon_asns();
+  reject_bogon_prefixes();
+#  reject_transit_paths();
+  reject_default_route(); #Bald erlauben
+  honor_graceful_shutdown();
+  accept;
+}
+
 filter cix_ixp_in {
   reject_bogon_asns();
   reject_bogon_prefixes();
