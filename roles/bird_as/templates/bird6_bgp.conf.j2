@@ -4,7 +4,7 @@ template bgp default_ibgp {
         local as {{ as_number }};
         direct;
         next hop self;
-	bfd graceful;
+        bfd graceful;
         import filter internal_in;
         export filter internal_out;
 }

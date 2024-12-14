@@ -1,4 +1,4 @@
-include "bird6_filter.conf";
+include "bird_filter.conf";
 
 # Router Konfiguration
 
@@ -9,8 +9,8 @@ protocol kernel {
         scan time 20;
         import filter own_subnet_morespec;
         export filter {
-                if net ~ [::/0] then reject;
-                krt_prefsrc = {{ as_v6.router_prefsrc }};
+                if net ~ [0.0.0.0/0] then reject;
+                krt_prefsrc = {{ as_v4.router_prefsrc }};
                 accept;
         };
         device routes;
@@ -28,12 +28,10 @@ protocol device {
 }
 
 protocol static {
-        route {{ as_prefix.v6 }} unreachable;
-        route {{ as_v6.as_prefix_host_spec }} unreachable;
+        route {{ as_prefix.v4 }} unreachable;
 }
 
 protocol bfd {
 }
 
-include "bird6_bgp.conf";
-
+include "bird_bgp.conf";
