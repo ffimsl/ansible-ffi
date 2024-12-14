@@ -1,6 +1,6 @@
 - name: install fail2ban
   apt:
-    pkg: ['fail2ban']
+    pkg: ['fail2ban', 'python3-systemd']
     state: present
 
 - name: generate default.local
