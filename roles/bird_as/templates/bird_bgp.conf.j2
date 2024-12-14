@@ -1,0 +1,60 @@
+# BGP Templates
+
+template bgp default_ibgp {
+        local as {{ as_number }};
+        direct;
+        next hop self;
+        bfd graceful;
+        import filter internal_in;
+        export filter internal_out;
+}
+
+template bgp default_ebgp_ixp {
+        local as {{ as_number }};
+        import filter ixp_in;
+        export filter own_subnet;
+}
+
+template bgp cix_ebgp_ixp {
+        source address {{ as_v4.cix_local_address }};
+        local as {{ as_number }};
+        import filter cix_ixp_in;
+        export filter own_subnet;
+}
+
+template bgp default_ebgp_transit {
+        local as {{ as_number }};
+        import filter transit_in;
+        export filter own_subnet;
+}
+
+# iBGP
+{% if as_v4.ibgp_cix_address_dict is defined %}{% for ibgp_partner in as_v4.ibgp_cix_address_dict %}
+protocol bgp ibgp_cix_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp {
+        source address {{ as_v4.ibgp_cix_address_dict[ibgp_partner]['source'] }};
+        neighbor {{ as_v4.ibgp_cix_address_dict[ibgp_partner]['address'] }} as {{ as_number }};
+        interface "{{ as_v4.ibgp_cix_address_dict[ibgp_partner]['interface'] }}";
+}
+{% endfor %}{% endif %}
+
+{% if as_v4.ibgp_direct_dict is defined %}{% for ibgp_partner in as_v4.ibgp_direct_dict %}
+protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp {
+        source address {{ as_v4.ibgp_direct_dict[ibgp_partner]['source'] }};
+        neighbor {{ as_v4.ibgp_direct_dict[ibgp_partner]['address'] }} as {{ as_number }};
+        interface "{{ as_v4.ibgp_direct_dict[ibgp_partner]['interface'] }}";
+}
+{% endfor %}{% endif %}
+
+# eBGP
+# IXPs
+{% if as_v4.ebgp_cix is defined %}{% for ebgp_partner in as_v4.ebgp_cix %}
+protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }} from cix_ebgp_ixp {
+        neighbor {{ as_v4.ebgp_cix[ebgp_partner]['address'] }} as {{ as_v4.ebgp_cix[ebgp_partner]['as'] }};
+        password "{{ as_v4.ebgp_cix[ebgp_partner]['password'] }}";
+}
+{% endfor %}{% endif %}
+
+# Transits
+# ...
+
+
