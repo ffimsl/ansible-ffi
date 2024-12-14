@@ -1,0 +1,9 @@
+{
+	email {{ orga.adminmail }}
+}
+
+{% for domain in caddy.domains %}
+{{ domain.name }} {
+	{{ domain.config }}
+}
+{% endfor %}
