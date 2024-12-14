@@ -1,0 +1,4 @@
+---
+# include xwiki tasks if xwiki variable defined
+- include_tasks: xwiki.yml
+  when: xwiki|default(false) != false

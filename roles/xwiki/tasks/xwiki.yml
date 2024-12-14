@@ -1,0 +1,48 @@
+---
+# Tasks for installing and configuring XWiki
+- name: install required packages
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - software-properties-common
+    cache_valid_time: 86400
+    state: present
+
+-  name: Ensure keyrings directory exists
+   file:
+    path: /usr/share/keyrings
+    state: directory
+
+- name: Download and XWiki GPG key
+  get_url:
+    url: https://maven.xwiki.org/public.gpg
+    dest: /usr/share/keyrings/xwiki-keyring.gpg
+    mode: 0644
+
+- name: Add XWiki repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/xwiki-keyring.gpg] http://maven.xwiki.org stable/"
+    state: present
+    filename: xwiki
+
+- name: Install XWiki
+  apt:
+    pkg:
+      - xwiki-xjetty-pgsql
+    cache_valid_time: 86400
+    state: present
+
+- name: Ensure systemd service xwiki is enabled
+  systemd:
+    name: xwiki
+    enabled: yes
+
+- name: Deploy custom systemd service file
+  template:
+    src: xwiki.service.j2
+    dest: /lib/systemd/system/xwiki.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart xwiki

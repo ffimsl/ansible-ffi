@@ -1,16 +1,4 @@
 ---
-- name: Install Caddy
-  apt:
-    name:
-      - caddy
-    state: present
-    update_cache: yes
-
-- name: create Caddyfile
-  template:
-    src: Caddyfile.j2
-    dest: /etc/caddy/Caddyfile
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart caddy
+# include caddy tasks only if caddy variable is set 
+- include_tasks: caddy.yml
+  when: caddy|default(false) != false
