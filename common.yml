@@ -1,0 +1,9 @@
+- import_playbook: all.yml
+
+- hosts: common
+  vars_files:
+    - passwords.yml
+  remote_user: root
+  roles:
+    - { role: caddy, tags: caddy, when: caddy|default(false) != false }
+    - { role: xwiki, tags: xwiki, when: xwiki|default(false) != false }

@@ -1,0 +1,7 @@
+---
+
+- name: restart xwiki
+  systemd:
+    name: xwiki
+    state: restarted
+    daemon_reload: yes

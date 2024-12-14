@@ -1,0 +1,4 @@
+---
+# include caddy tasks only if caddy variable is set 
+- include_tasks: caddy.yml
+  when: caddy|default(false) != false

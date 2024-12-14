@@ -1,0 +1,6 @@
+---
+- name: Restart caddy
+  systemd:
+    name: caddy
+    state: restarted
+    enabled: true
