@@ -30,6 +30,7 @@ protocol device {
 protocol static {
         route {{ as_prefix.v6 }} unreachable;
         route {{ as_v6.as_prefix_host_spec }} unreachable;
+	route ::/0 unreachable;
 }
 
 protocol bfd {

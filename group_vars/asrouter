@@ -9,6 +9,11 @@ as_prefix:
 as_tunnel_endpoints:
   "Freifunk Muensterland":
     id: 1
+    allowed_prefixes:
+      v4:
+        - "45.154.111.64/32"
+      v6:
+        - "2a14:440:1::/48+"
     peers:
      "rowe":
        peer_id: 0

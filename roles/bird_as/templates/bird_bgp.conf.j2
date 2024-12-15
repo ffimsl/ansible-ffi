@@ -5,6 +5,7 @@ template bgp default_ibgp {
         direct;
         next hop self;
         bfd graceful;
+	rr client;
         import filter internal_in;
         export filter internal_out;
 }
@@ -13,9 +14,8 @@ template bgp default_ibgp_downstreams {
         local as {{ as_number }};
         direct;
         next hop self;
-        bfd graceful;
-        import filter own_subnet_morespec;
-        export filter own_subnet_morespec;
+        import none;
+        export none;
 }
 
 template bgp default_ebgp_ixp {
@@ -65,6 +65,16 @@ protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }} from default_i
 protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }} from default_ibgp_downstreams {
         source address {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('address') }};
         neighbor {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('peer') }} as {{ as_tunnel_endpoints[community]["peers"][peer]["remote_as"] }};
+	import filter {
+{% for prefix in as_tunnel_endpoints[community]["allowed_prefixes"]["v4"] %}
+		if net ~ [{{ prefix }}] then accept;
+{% endfor %}
+		reject;
+	};
+	export filter {
+		if net ~ [0.0.0.0/0] then accept;
+		reject;
+	};
 }
 
 {% endfor %}

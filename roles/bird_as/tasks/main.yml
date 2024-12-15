@@ -44,6 +44,7 @@
   ansible.builtin.command:
     cmd: "birdc configure check"
   register: birdc_check_out
+  failed_when: '"syntax error" in birdc_check_out.stdout'
   when:
     - not ansible_check_mode
     - (bird_filter_config.changed or bird_bgp_config.changed or bird_config.changed)
@@ -63,6 +64,7 @@
   ansible.builtin.command:
     cmd: "birdc6 configure check"
   register: birdc6_check_out
+  failed_when: '"syntax error" in birdc6_check_out.stdout'
   when:
     - not ansible_check_mode
     - (bird6_filter_config.changed or bird6_bgp_config.changed or bird6_config.changed)
