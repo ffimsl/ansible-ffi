@@ -14,6 +14,7 @@
   command: which rsyslogd
   register: rsyslog_check
   ignore_errors: true
+  check_mode: false
 
 - name: set fail2ban lookup-method by setting fact for backend_systemd
   set_fact:
