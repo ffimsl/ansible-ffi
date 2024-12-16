@@ -7,3 +7,4 @@
   roles:
     - { role: caddy, tags: caddy, when: caddy|default(false) != false }
     - { role: xwiki, tags: xwiki, when: xwiki|default(false) != false }
+    - { role: uffd, tags: uffd, when: uffd|default(false) != false }

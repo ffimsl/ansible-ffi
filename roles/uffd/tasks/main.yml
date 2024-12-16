@@ -1,0 +1,4 @@
+---
+# include caddy tasks only if uffd variable is set 
+- include_tasks: uffd.yml
+  when: uffd|default(false) != false
