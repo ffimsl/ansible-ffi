@@ -11,15 +11,13 @@ uffd:
   secret_key: "{{ passwords.uffd.secret_key }}"
   mfa_rp_name: 'FFI SSO Service'
   footer_links:
-    - url: 'https://example.com'
-      title: 'Example 1'
-    - url: 'https://example2.com'
-      title: 'Example 2'
-    - url: 'https://example3.com'
-      title: 'Example 3'
+    - url: 'https://freifunk-muensterland.de/impressum/'
+      title: 'Impressum'
+    - url: 'https://freifunk-muensterland.de/datenschutzerklaerung/'
+      title: 'Datenschutzerklärung'
   login_banner: ''
   branding_logo_url: '/static/empty.png'
-  site_title: 'FFI SSO'
+  site_title: 'FFI SSO Service'
   organisation_name: "{{ orga.name }}"
   organisation_contact: "{{ orga.email }}"
   welcome_text: 'Wilkommen Hier könnte ihre Werbung stehen.'
