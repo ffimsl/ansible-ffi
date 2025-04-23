@@ -11,6 +11,16 @@
     mode: 0644
     create: yes
 
+- name: Disable vim mouse integration by default
+  lineinfile:
+    dest: ~/.vimrc
+    regexp: '^set mouse'
+    line: 'set mouse-=a'
+    owner: root
+    group: root
+    mode: 0644
+    create: yes
+
 - name: Update .bash_profile file
   ansible.builtin.template:
     src: bash_profile.j2
@@ -32,10 +42,11 @@
     update_cache: yes
 
 - name: uninstall unneeded packages
-  ansible.builtin.apt:
+  apt:
     pkg: ['rpcbind']
     update_cache: yes
     state: absent
+  when: "keep_rpcbind_installed is not defined or (keep_rpcbind_installed is defined and keep_rpcbind_installed == false)"
 
 - name: Unterstützung für deutsche Sprache aktivieren
   ansible.builtin.locale_gen: name=de_DE.UTF-8 state=present
