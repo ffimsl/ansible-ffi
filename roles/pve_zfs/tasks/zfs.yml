@@ -1,0 +1,40 @@
+- name: Update /etc/modprobe.d/zfs.conf
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/zfs.conf
+    regexp: '{{item[0]}}'
+    line: "{{item[1]}}"
+    create: yes
+  loop:
+  - ['^options zfs zfs_arc_min[ \t]*=', 'options zfs zfs_arc_min={{pve_zfs.zfs_arc.min}}']
+  - ['^options zfs zfs_arc_max[ \t]*=', 'options zfs zfs_arc_max={{pve_zfs.zfs_arc.max}}']
+  when: pve_zfs.zfs_arc|default(false) != false
+
+- name: Configure zfs-zed
+  when: pve_zfs.zed|default(false) != false
+  block:
+    - name: Install zfs-zed and required utils
+      apt:
+        pkg: zfs-zed
+        cache_valid_time: 86400
+        state: present
+    - name: Deploy /etc/zfs/zed.d/zed.rc
+      template:
+        src: zed.rc.j2
+        dest: /etc/zfs/zed.d/zed.rc
+        owner: root
+        group: root
+        mode: 0600
+      notify:
+      - restart zfs-zed
+    - name: Enable zfs-zed service
+      service:
+        name: zfs-zed.service
+        enabled: yes
+
+- name: Deploy /etc/cron.d/zfsutils-linux
+  template:
+    src: zfsutils-linux.j2
+    dest: /etc/cron.d/zfsutils-linux
+    owner: root
+    group: root
+    mode: 0644

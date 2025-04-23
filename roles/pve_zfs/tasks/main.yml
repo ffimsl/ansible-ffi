@@ -1,0 +1,7 @@
+---
+# role for configuring zfs on pve
+# include zfs.yml if pve_zfs is defined and not false
+- name: Include ZFS tasks
+  include_tasks: zfs.yml
+  when: pve_zfs|default(false) != false
+ 

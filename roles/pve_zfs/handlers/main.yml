@@ -1,0 +1,4 @@
+- name: restart zfs-zed
+  service: 
+    name: zfs-zed.service
+    state: restarted
