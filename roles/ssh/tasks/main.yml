@@ -2,7 +2,14 @@
 - name: SSH-Schlüsseldatei generieren
   template:
     src: authorized_keys.j2
-    dest: /root/.ssh/authorized_keys
+    dest: /root/.ssh/authorized_keys_ansible
+
+- name: Ansible-SSH-Schlüsseldatei in SSH Konfig aufnehmen.
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^[#]?AuthorizedKeysFile
+    line: "AuthorizedKeysFile     .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys_ansible"
+  notify: reload ssh
 
 - name: SSH-Dämon Passwortanmeldung abschalten
   lineinfile:
@@ -15,7 +22,7 @@
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: ^[#]?PermitRootLogin
-    line: "PermitRootLogin without-password"
+    line: "PermitRootLogin prohibit-password"
   notify:
     - reload ssh
 
