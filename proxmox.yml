@@ -1,0 +1,8 @@
+- import_playbook: all.yml
+
+- hosts: proxmox
+  vars_files:
+    - passwords.yml
+  remote_user: root
+#  roles:
+#    - { role: pve_zfs, tags: "pve_zfs" }
