@@ -46,3 +46,21 @@
     group: root
     mode: 0644
   notify: restart xwiki
+
+- name: Deploy custom xwiki configuration file
+  template:
+    src: xwiki.cfg.j2
+    dest: /etc/xwiki/xwiki.cfg
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart xwiki
+
+- name: Deploy xwiki properties file
+  template:
+    src: xwiki.properties.j2
+    dest: /etc/xwiki/xwiki.properties
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart xwiki
