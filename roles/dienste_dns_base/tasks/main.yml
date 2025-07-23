@@ -1,0 +1,19 @@
+---
+
+- name: "Download apt repository signing-key"
+  ansible.builtin.get_url:
+    url: https://packages.sury.org/bind/apt.gpg
+    dest: /usr/share/keyrings/sury-bind-archive-keyring.gpg
+    mode: '0644'
+
+- name: "Add apt repository for ISC-BIND"
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/sury-bind-archive-keyring.gpg] https://packages.sury.org/bind/ {{ ansible_distribution_release }} main"
+    state: present
+    filename: sury-bind
+
+- name: "Install BIND9 Package"
+  ansible.builtin.apt:
+    name: "bind9"
+    update_cache: True
+

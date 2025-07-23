@@ -1,0 +1,9 @@
+- import_playbook: all.yml
+
+- hosts: dienste_dns_hidden
+  vars_files:
+    - passwords.yml
+  remote_user: root
+  roles:
+    - { role: dienste_dns_base, tags: "dienste_dns_base" }
+    - { role: dienste_dns_hidden, tags: "dienste_dns_hidden" }
