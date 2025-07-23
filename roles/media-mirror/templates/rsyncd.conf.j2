@@ -1,0 +1,23 @@
+uid = nobody
+gid = nogroup
+use chroot = yes
+max connections = 10
+log file = /var/log/rsyncd.log
+timeout = 600
+pid file = /var/run/rsyncd.pid
+lock file = /var/run/rsync.lock
+
+[mediaread]
+    path = {{ mirror.root }}
+    comment = media.freifunk.net Mirror (readonly)
+    read only = yes
+    list = yes
+
+[mediawrite]
+    path = {{ mirror.root }}
+    comment = media.freifunk.net Mirror (read/write)
+    read only = no
+    list = yes
+    hosts allow = {{ mirror.rsync_hosts_allow }}
+    uid = www-data
+    gid = www-data

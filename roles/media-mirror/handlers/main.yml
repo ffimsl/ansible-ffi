@@ -1,0 +1,9 @@
+- name: Restart rsync
+  systemd:
+    name: rsync
+    state: restarted
+
+- name: Reload Caddy
+  systemd:
+    name: caddy
+    state: reloaded

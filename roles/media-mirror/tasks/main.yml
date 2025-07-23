@@ -1,0 +1,51 @@
+---
+- name: Ensure required packages are installed
+  apt:
+    name:
+      - rsync
+      - caddy
+    state: present
+    update_cache: yes
+
+- name: Create mirror directory
+  file:
+    path: "{{ mirror.root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    recurse: yes
+
+- name: Deploy rsync configuration
+  template:
+    src: rsyncd.conf.j2
+    dest: /etc/rsyncd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart rsync
+
+- name: Enable and start rsync daemon
+  systemd:
+    name: rsync
+    enabled: yes
+    state: started
+
+- name: Configure Caddy
+  copy:
+    dest: /etc/caddy/Caddyfile
+    content: |
+      {{ mirror.dns }} {
+          root * {{ mirror.root }}
+          file_server browse
+      }
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Caddy
+
+- name: Ensure Caddy is enabled and running
+  systemd:
+    name: caddy
+    enabled: yes
+    state: started
