@@ -1,0 +1,14 @@
+{{ ansible_managed }}
+
+acl authorative-ffi {
+        10.10.10.10; # Beispiel
+	#TODO LOOP mit allen IPs der Authorativen-DNS-Servern
+};
+
+options {
+        directory "/var/named";
+        recursion no;
+        allow-recursion { none; };
+        allow-query { authorative-ffi; };
+        allow-transfer { authorative-ffi; };
+};
