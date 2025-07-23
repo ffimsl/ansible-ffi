@@ -8,7 +8,6 @@
     - { role: dienste_dns_base, tags: "dienste_dns_base" }
     - { role: dienste_dns_hidden, tags: "dienste_dns_hidden" }
 
-authoritative
 - hosts: dienste_dns_authoritative
   vars_files:
     - passwords.yml
