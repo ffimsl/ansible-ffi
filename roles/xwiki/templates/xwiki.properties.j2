@@ -1624,14 +1624,14 @@ url.standard.multiwiki.isPathBased=false
 #-# The base URL of the OpenId Connect Provider to use as starting point to discover the provider configuration.
 #-# See following endpoints properties if the provider does not support OpenID Connect discovery.
 #-# If not indicated and no custom endpoint is provided, it will be asked to the user.
-# oidc.provider=https://www.xwiki.org/xwiki/oidc
+oidc.provider=https://sso.ffi.ms/
 
 #-# The generic OpenId Connect endpoints to use to communicate with the provider.
 #-# It's generally not needed when providing the provider discovery endpoint (which is supposed to provide those endpoints).
-# oidc.endpoint.authorization=https://www.xwiki.org/xwiki/oidc/authorization
-# oidc.endpoint.token=https://xwikiorg-node1.xwikisas.com/xwiki/oidc/token
-# oidc.endpoint.userinfo=https://www.xwiki.org/xwiki/oidc/userinfo
-# oidc.endpoint.logout=https://www.xwiki.org/xwiki/oidc/logout
+oidc.endpoint.authorization=https://sso.ffi.ms/oauth2/authorize
+oidc.endpoint.token=https://sso.ffi.ms/oauth2/token
+oidc.endpoint.userinfo=https://sso.ffi.ms/oauth2/userinfo
+oidc.endpoint.logout=https://sso.ffi.ms/logout
 
 #-# It's possible to add custom HTTP headers to the endpoint (generally only needed for bad or non-oidc providers)
 #-# by adding the suffix ".headers" to the endpoint property key and listing the custom headers using key:value format.
@@ -1652,7 +1652,7 @@ url.standard.multiwiki.isPathBased=false
 #-# But depending on the provider more can be listed.
 #-# 
 #-# The default is:
-# oidc.scope=openid,profile,email,address,phone
+oidc.scope=openid,profile,email,address
 
 #-# The response type to control the flow used by the OpenId Connect protocol.
 #-# This is often used to control if the information about the user should
@@ -1673,7 +1673,7 @@ url.standard.multiwiki.isPathBased=false
 #-# * POST: use POST HTTP method
 #-# 
 #-# The default is:
-# oidc.endpoint.userinfo.method=GET
+oidc.endpoint.userinfo.method=GET
 
 #-# The pattern to use to generate the XWiki user name.
 #-# 
@@ -1722,7 +1722,7 @@ url.standard.multiwiki.isPathBased=false
 #-# The variable syntax also have other features (fallback value, etc.) detailed on https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html.
 #-# 
 #-# The default is: 
-# oidc.user.nameFormater=${oidc.issuer.host._clean}-${oidc.user.preferredUsername._clean}
+oidc.user.nameFormater=${oidc.user.preferredUsername._clean._lowerCase}
 
 #-# The pattern to use to generate the unique identifier of the user in the OpenId Connect provider.
 #-# It is used to avoid collisions with user have similar name.
@@ -1730,7 +1730,7 @@ url.standard.multiwiki.isPathBased=false
 #-# The syntax is the same than the one described for oidc.user.nameFormater property.
 #-# 
 #-# The default is: 
-# oidc.user.subjectFormater=${oidc.user.subject}
+oidc.user.subjectFormater=${oidc.user.subject}
 
 #-# It's possible to associate non standard properties coming from the OpenID Connect provider with the XWiki user.
 #-# It's a map with the name of the XWiki user property and a format similar to the one defined in oidc.user.nameFormater for the OpenID Connect side.
@@ -1782,7 +1782,7 @@ url.standard.multiwiki.isPathBased=false
 # oidc.groups.claim=customobject.customgroups
 #-# 
 #-# The default is:
-# oidc.groups.claim=xwiki_groups
+oidc.groups.claim=groups
 
 #-# Receiving a groups list is enough to enable group synchronization but you might need to configure XWiki groups names different from the remote groups names.
 #-# It's also required to indicate what's the field containing the list of groups (that's not an OpenID Connect standard) using oidc.groups.claim property.
@@ -1829,7 +1829,7 @@ url.standard.multiwiki.isPathBased=false
 #-# xwiki_user_<fieldname>: the suffix to use to request any field in the user profile document (generally when the provider is XWiki) 
 #-# The default is:
 # oidc.userinfoclaims=xwiki_user_accessibility,xwiki_user_company,xwiki_user_displayHiddenDocuments,xwiki_user_editor,xwiki_user_usertype
-
+oidc.userinfoclaims=groups,name,email,preferred_username
 #-# The time after which the user information should be refreshed (in milliseconds)
 #-# 
 #-# The default is:
@@ -1842,11 +1842,11 @@ url.standard.multiwiki.isPathBased=false
 
 #-# The client identifier used by the authentication.
 #-# The default is the identifier of the XWiki instance.
-# oidc.clientid=
+oidc.clientid=XXXXXXXXXXXXXXXXXXX
 
 #-# The client secret (optionally) registered on the provider.
 #-# By default nothing is sent to the provider.
-# oidc.secret=
+oidc.secret=XXXXXXXXXXXXXXXXXXXX
 
 #-# How to send the client id and secret.
 #-# 
@@ -1890,4 +1890,4 @@ url.standard.multiwiki.isPathBased=false
 #-# Disable the OpenId Connect authenticator
 #-# 
 #-# The default is:
-# oidc.skipped=false
+oidc.skipped=false
