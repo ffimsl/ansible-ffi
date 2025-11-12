@@ -32,6 +32,9 @@ as_v4:
       address: "185.1.74.2"
       as: "57555"
       password: "{{ passwords.bgp.ber_a.cix_rs }}"
+    "wobcom":
+      address: "185.1.74.45"
+      as: "9136"
 
 as_v6:
   cix_local_address: "2001:7f8:a5::20:9894:2"
@@ -64,3 +67,6 @@ as_v6:
       address: "2001:7f8:a5::5:7555:2"
       as: "57555"
       password: "{{ passwords.bgp.ber_a.cix_rs }}"
+    "wobcom":
+      address: "2001:7f8:a5::9136:1"
+      as: "9136"
