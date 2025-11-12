@@ -86,7 +86,9 @@ protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }} from default_ibgp_d
 {% if as_v4.ebgp_cix is defined %}{% for ebgp_partner in as_v4.ebgp_cix %}
 protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }} from cix_ebgp_ixp {
         neighbor {{ as_v4.ebgp_cix[ebgp_partner]['address'] }} as {{ as_v4.ebgp_cix[ebgp_partner]['as'] }};
+{% if as_v4.ebgp_cix[ebgp_partner]['password'] is defined %}
         password "{{ as_v4.ebgp_cix[ebgp_partner]['password'] }}";
+{% endif %}
 }
 {% endfor %}{% endif %}
 
