@@ -1620,7 +1620,7 @@ url.standard.multiwiki.isPathBased=false
 # ###################################################################################
 # OpenID Connect
 # ###################################################################################
-
+{% if xwiki.enable_oidc | default(false) == true %}
 #-# The base URL of the OpenId Connect Provider to use as starting point to discover the provider configuration.
 #-# See following endpoints properties if the provider does not support OpenID Connect discovery.
 #-# If not indicated and no custom endpoint is provided, it will be asked to the user.
@@ -1842,12 +1842,11 @@ oidc.userinfoclaims=groups,name,email,preferred_username
 
 #-# The client identifier used by the authentication.
 #-# The default is the identifier of the XWiki instance.
-oidc.clientid=XXXXXXXXXXXXXXXXXXX
+oidc.clientid={{passwords.xwiki.oid_clientid}}
 
 #-# The client secret (optionally) registered on the provider.
 #-# By default nothing is sent to the provider.
-oidc.secret=XXXXXXXXXXXXXXXXXXXX
-
+oidc.secret={{passwords.xwiki.oid_secret}}
 #-# How to send the client id and secret.
 #-# 
 #-# Supported values are:
@@ -1891,3 +1890,4 @@ oidc.secret=XXXXXXXXXXXXXXXXXXXX
 #-# 
 #-# The default is:
 oidc.skipped=false
+{% endif %}
