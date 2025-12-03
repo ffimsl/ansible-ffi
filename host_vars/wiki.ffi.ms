@@ -1,4 +1,5 @@
-xwiki: true
+xwiki:
+  memory_xmx: "-Xmx4096m"
 
 caddy:
   domains:
