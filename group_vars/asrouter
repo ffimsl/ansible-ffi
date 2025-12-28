@@ -4,15 +4,16 @@ as_number: 209894
 
 as_prefix:
   v6: "2a14:440::/30"
-  v4: "217.70.1.0/24"
+  v4: 
+    - "45.154.111.0/24"
+    - "217.70.1.0/24"
 
 as_tunnel_endpoints:
   "Freifunk Muensterland":
     id: 1
     allowed_prefixes:
       v4:
-        - "217.70.1.73/32"
-        - "217.70.1.74/32"
+        - "45.154.111.64/28"
       v6:
         - "2a14:440:1::/48+"
     peers:

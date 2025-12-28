@@ -32,6 +32,9 @@ as_v4:
       address: "185.1.74.2"
       as: "57555"
       password: "{{ passwords.bgp.ber_a.cix_rs }}"
+    "wobcom":
+      address: "185.1.74.45"
+      as: "9136"
 
 as_v6:
   cix_local_address: "2001:7f8:a5::20:9894:2"
@@ -64,3 +67,23 @@ as_v6:
       address: "2001:7f8:a5::5:7555:2"
       as: "57555"
       password: "{{ passwords.bgp.ber_a.cix_rs }}"
+    "wobcom":
+      address: "2001:7f8:a5::9136:1"
+      as: "9136"
+
+  ebgp_lg:
+    "bgptools":
+      description: "bgp.tools Looking Glass"
+      source: "2a14:440:1100::1"
+      address: "2a0c:2f07:9459::b11"
+      as: "212232"
+    "bgp_he_net":
+      description: "he.net Looking Glass"
+      source: "2a14:440:1100::1"
+      address: "2600:7000:1000::14"
+      as: "393338"
+    "bgp_ffi_lg":
+      description: "FFI Fernglas Looking Glass"
+      source: "2a14:440:1100::1"
+      address: "2a02:1799:9::151 port 1179"
+      as: "209894"

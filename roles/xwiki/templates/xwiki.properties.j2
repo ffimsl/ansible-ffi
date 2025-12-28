@@ -1620,7 +1620,7 @@ url.standard.multiwiki.isPathBased=false
 # ###################################################################################
 # OpenID Connect
 # ###################################################################################
-
+{% if xwiki.enable_oidc | default(false) == true %}
 #-# The base URL of the OpenId Connect Provider to use as starting point to discover the provider configuration.
 #-# See following endpoints properties if the provider does not support OpenID Connect discovery.
 #-# If not indicated and no custom endpoint is provided, it will be asked to the user.
@@ -1791,6 +1791,16 @@ oidc.groups.claim=groups
 # oidc.groups.mapping=MyXWikiGroup2=my-oidc-group2
 # oidc.groups.mapping=MyXWikiGroup2=my-oidc-group3
 
+#-# Filtering of the groups to be synchronized can also be done using regular expressions, if no explicit mapping (see above) is set. 
+#-# The following 2 properties define regular expressions to filter groups to be included in the synchronization or groups to be excluded from the synchronization 
+#-# (by default all groups coming from the claim are synchronized). The XWiki group fullname name (including the space reference) needs to match the include regex 
+#-# and not match the exclude regex in order to be updated to match the value of the claim property for the user. Regex are in java regex syntax; if a backslash 
+#-# needs to be used, it needs to be escaped (with another backslash). Either or both these properties can be set.
+#-# For example:
+# oidc.groups.mapping.include=^XWiki\\.(.*)-APPXWIKI-(.*)$
+oidc.groups.mapping.include=^XWiki\.xwiki_(.*)$
+# oidc.groups.mapping.exclude=^XWiki\\.Local\\.
+
 #-# The groups the user need to belong to be allowed to authenticate.
 #-# Not taken into account if not set or empty.
 #-# 
@@ -1842,12 +1852,11 @@ oidc.userinfoclaims=groups,name,email,preferred_username
 
 #-# The client identifier used by the authentication.
 #-# The default is the identifier of the XWiki instance.
-oidc.clientid=XXXXXXXXXXXXXXXXXXX
+oidc.clientid={{passwords.xwiki.oid_clientid}}
 
 #-# The client secret (optionally) registered on the provider.
 #-# By default nothing is sent to the provider.
-oidc.secret=XXXXXXXXXXXXXXXXXXXX
-
+oidc.secret={{passwords.xwiki.oid_secret}}
 #-# How to send the client id and secret.
 #-# 
 #-# Supported values are:
@@ -1891,3 +1900,4 @@ oidc.secret=XXXXXXXXXXXXXXXXXXXX
 #-# 
 #-# The default is:
 oidc.skipped=false
+{% endif %}
