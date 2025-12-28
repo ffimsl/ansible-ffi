@@ -1,45 +1,101 @@
 # BGP Templates
-
-template bgp default_ibgp {
+template bgp default_ibgp_v4 {
         local as {{ as_number }};
         direct;
-        next hop self;
         bfd graceful;
-	rr client;
-        import filter internal_in;
-        export filter internal_out;
+        rr client;
+        ipv4 {
+                next hop self;
+                import filter internal_in;
+                export filter internal_out;
+        };
+}
+
+template bgp default_ibgp_v6 {
+        local as {{ as_number }};
+        direct;
+        bfd graceful;
+        rr client;
+        ipv6 {
+                next hop self;
+                import filter internal_in;
+                export filter internal_out;
+        };
 }
 
 template bgp default_ibgp_downstreams {
         local as {{ as_number }};
         direct;
-        next hop self;
-        import none;
-        export none;
+        ipv4 {
+                next hop self;
+                import none;
+                export none;
+        };
+        ipv6 {
+                next hop self;
+                import none;
+                export none;
+        };
 }
 
 template bgp default_ebgp_ixp {
         local as {{ as_number }};
-        import filter ixp_in;
-        export filter own_subnet;
+        ipv4 {
+                import filter ixp_in;
+                export filter own_subnet;
+        };
+        ipv6 {
+                import filter ixp_in;
+                export filter own_subnet;
+        };
 }
 
 template bgp cix_ebgp_ixp {
-        source address {{ as_v4.cix_local_address }};
         local as {{ as_number }};
-        import filter cix_ixp_in;
-        export filter own_subnet;
+        ipv4 {
+                import filter cix_ixp_in;
+                export filter own_subnet;
+        };
+        ipv6 {
+                import filter cix_ixp_in;
+                export filter own_subnet;
+        };
 }
 
 template bgp default_ebgp_transit {
         local as {{ as_number }};
-        import filter transit_in;
-        export filter own_subnet;
+        ipv4 {
+                import filter transit_in;
+                export filter own_subnet;
+        };
+        ipv6 {
+                import filter transit_in;
+                export filter own_subnet;
+        };
 }
+
+template bgp lookingglass {
+        local as {{ as_number }};
+        multihop 64;
+        advertise hostname on;
+        ipv6 {
+                add paths tx;
+                import filter { reject; };
+                export filter { accept; };
+                next hop keep;
+        };
+        ipv4 {
+                add paths tx;
+                import filter { reject; };
+                export filter { accept; };
+                next hop keep;
+        };
+}
+
 
 # iBGP
 {% if as_v4.ibgp_cix_address_dict is defined %}{% for ibgp_partner in as_v4.ibgp_cix_address_dict %}
-protocol bgp ibgp_cix_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp {
+protocol bgp ibgp_cix_xcon_{{ ibgp_partner|replace('-','_') }}_v4 from default_ibgp_v4 {
         source address {{ as_v4.ibgp_cix_address_dict[ibgp_partner]['source'] }};
         neighbor {{ as_v4.ibgp_cix_address_dict[ibgp_partner]['address'] }} as {{ as_number }};
 {% if as_v4.ibgp_cix_address_dict[ibgp_partner]['interface'] is defined %}
@@ -48,8 +104,20 @@ protocol bgp ibgp_cix_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp
 }
 {% endfor %}{% endif %}
 
+
+{% if as_v6.ibgp_cix_address_dict is defined %}{% for ibgp_partner in as_v6.ibgp_cix_address_dict %}
+protocol bgp ibgp_cix_xcon_{{ ibgp_partner|replace('-','_') }}_v6 from default_ibgp_v6 {
+        source address {{ as_v6.ibgp_cix_address_dict[ibgp_partner]['source'] }};
+        neighbor {{ as_v6.ibgp_cix_address_dict[ibgp_partner]['address'] }} as {{ as_number }};
+{% if as_v6.ibgp_cix_address_dict[ibgp_partner]['interface'] is defined %}
+        interface "{{ as_v6.ibgp_cix_address_dict[ibgp_partner]['interface'] }}";
+{% endif %}
+}
+{% endfor %}{% endif %}
+
+
 {% if as_v4.ibgp_direct_dict is defined %}{% for ibgp_partner in as_v4.ibgp_direct_dict %}
-protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }} from default_ibgp {
+protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }}_v4 from default_ibgp_v4 {
         source address {{ as_v4.ibgp_direct_dict[ibgp_partner]['source'] }};
         neighbor {{ as_v4.ibgp_direct_dict[ibgp_partner]['address'] }} as {{ as_number }};
 {% if as_v4.ibgp_direct_dict[ibgp_partner]['interface'] is defined %}
@@ -58,22 +126,53 @@ protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }} from default_i
 }
 {% endfor %}{% endif %}
 
+
+{% if as_v6.ibgp_direct_dict is defined %}{% for ibgp_partner in as_v6.ibgp_direct_dict %}
+protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }}_v6 from default_ibgp_v6 {
+        source address {{ as_v6.ibgp_direct_dict[ibgp_partner]['source'] }};
+        neighbor {{ as_v6.ibgp_direct_dict[ibgp_partner]['address'] }} as {{ as_number }};
+{% if as_v6.ibgp_direct_dict[ibgp_partner]['interface'] is defined %}
+        interface "{{ as_v6.ibgp_direct_dict[ibgp_partner]['interface'] }}";
+{% endif %}
+}
+{% endfor %}{% endif %}
+
+
 #iBGP Downstreams
 {% for community in as_tunnel_endpoints %}
 #{{ community }}
 {% for peer in as_tunnel_endpoints[community]["peers"] %}
-protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }} from default_ibgp_downstreams {
-        source address {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('address') }};
-        neighbor {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('peer') }} as {{ as_tunnel_endpoints[community]["peers"][peer]["remote_as"] }};
-	import filter {
+protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }}_v4 from default_ibgp_downstreams {
+	source address {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('address') }};
+	neighbor {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('peer') }} as {{ as_tunnel_endpoints[community]["peers"][peer]["remote_as"] }};
+	ipv4 {
+		import filter {
 {% for prefix in as_tunnel_endpoints[community]["allowed_prefixes"]["v4"] %}
-		if net ~ [{{ prefix }}] then accept;
+			if net ~ [{{ prefix }}] then accept;
 {% endfor %}
-		reject;
+			reject;
+		};
+		export filter {
+			if net ~ [0.0.0.0/0] then accept;
+			reject;
+		};
 	};
-	export filter {
-		if net ~ [0.0.0.0/0] then accept;
-		reject;
+}
+
+protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }}_v6 from default_ibgp_downstreams {
+	source address {{ as_v6.gre_tunnel_transfer_network | ansible.utils.ipsubnet(127, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('address') }};
+	neighbor {{ as_v6.gre_tunnel_transfer_network | ansible.utils.ipsubnet(127, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('peer') }} as {{ as_tunnel_endpoints[community]["peers"][peer]["remote_as"] }};
+	ipv6 {
+		import filter {
+{% for prefix in as_tunnel_endpoints[community]["allowed_prefixes"]["v6"] %}
+			if net ~ [{{ prefix }}] then accept;
+{% endfor %}
+			reject;
+		};
+		export filter {
+			if net ~ [::/0] then accept;
+			reject;
+		};
 	};
 }
 
@@ -84,16 +183,37 @@ protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }} from default_ibgp_d
 # eBGP
 # IXPs
 {% if as_v4.ebgp_cix is defined %}{% for ebgp_partner in as_v4.ebgp_cix %}
-protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }} from cix_ebgp_ixp {
+protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v4 from cix_ebgp_ixp {
+        source address {{ as_v4.cix_local_address }};
         neighbor {{ as_v4.ebgp_cix[ebgp_partner]['address'] }} as {{ as_v4.ebgp_cix[ebgp_partner]['as'] }};
 {% if as_v4.ebgp_cix[ebgp_partner]['password'] is defined %}
+        authentication md5;
         password "{{ as_v4.ebgp_cix[ebgp_partner]['password'] }}";
 {% endif %}
 }
 {% endfor %}{% endif %}
 
+{% if as_v6.ebgp_cix is defined %}{% for ebgp_partner in as_v6.ebgp_cix %}
+protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v6 from cix_ebgp_ixp {
+        source address {{ as_v6.cix_local_address }};
+        neighbor {{ as_v6.ebgp_cix[ebgp_partner]['address'] }} as {{ as_v6.ebgp_cix[ebgp_partner]['as'] }};
+{% if as_v6.ebgp_cix[ebgp_partner]['password'] is defined %}
+        authentication md5;
+        password "{{ as_v6.ebgp_cix[ebgp_partner]['password'] }}";
+{% endif %}
 
-# Transits
-# ...
+}
+{% endfor %}{% endif %}
 
 
+# eBGP
+# Looking-glasses
+{% if as_v6.ebgp_lg is defined %}{% for ebgp_partner in as_v6.ebgp_lg %}
+protocol bgp ebgp_{{ ebgp_partner|replace('-','_') }}_v6 from lookingglass {
+{% if as_v6.ebgp_lg[ebgp_partner]['description'] is defined %}
+        description "{{ as_v6.ebgp_lg[ebgp_partner]['description'] }}";
+{% endif %}
+        source address {{ as_v6.ebgp_lg[ebgp_partner]['source'] }};
+        neighbor {{ as_v6.ebgp_lg[ebgp_partner]['address'] }} as {{ as_v6.ebgp_lg[ebgp_partner]['as'] }};
+}
+{% endfor %}{% endif %}

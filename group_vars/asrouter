@@ -4,18 +4,24 @@ as_number: 209894
 
 as_prefix:
   v6: "2a14:440::/30"
-  v4: "45.154.111.0/24"
+  v4: 
+    - "45.154.111.0/24"
+    - "217.70.1.0/24"
 
 as_tunnel_endpoints:
   "Freifunk Muensterland":
     id: 1
     allowed_prefixes:
       v4:
-        - "45.154.111.64/32"
+        - "45.154.111.64/28"
       v6:
         - "2a14:440:1::/48+"
     peers:
-     "rowe":
+     "erpel":
        peer_id: 0
-       gre6_target: "2a01:4f8:171:124a::2"
+       gre6_target: "2a01:4f8:191:21e1::173"
+       remote_as: 209894
+     "enterich":
+       peer_id: 1
+       gre6_target: "2a01:4f8:c17:1442::1"
        remote_as: 209894

@@ -1,8 +1,8 @@
 ---
-- name: install bird package
-  ansible.builtin.apt:
-    name: 'bird'
-    update_cache: yes
+#- name: install bird package
+#  ansible.builtin.apt:
+#    name: 'bird3'
+#    update_cache: yes
 
 - name: bird_bgp.conf Konfigruation
   ansible.builtin.template:
@@ -22,23 +22,11 @@
     dest: /etc/bird/bird.conf
   register: bird_config
 
-- name: bird6_bgp.conf Konfigruation
-  ansible.builtin.template:
-    src: bird6_bgp.conf.j2
-    dest: /etc/bird/bird6_bgp.conf
-  register: bird6_bgp_config
-
-- name: bird6_filter.conf Konfigruation
-  ansible.builtin.template:
-    src: bird6_filter.conf.j2
-    dest: /etc/bird/bird6_filter.conf
-  register: bird6_filter_config
-
-- name: bird6.conf Konfigruation
-  ansible.builtin.template:
-    src: bird6.conf.j2
-    dest: /etc/bird/bird6.conf
-  register: bird6_config
+- name: bird_no_ansible.conf einmalig als leere Datei anlegen
+  ansible.builtin.command: install -m 0644 -o root -g root /dev/null /etc/bird/bird_no_ansible.conf
+  args:
+    creates: /etc/bird/bird_no_ansible.conf
+  register: bird_config
 
 - name: bird Config Check
   ansible.builtin.command:
@@ -59,23 +47,3 @@
     - '"Configuration OK" in birdc_check_out.stdout'
   changed_when: '"Reconfigured" in birdc_configure.stdout or "Reconfiguration in progress" in birdc_configure.stdout'
   failed_when: '"Reconfigured" not in birdc_configure.stdout and "Reconfiguration in progress" not in birdc_configure.stdout'
-
-- name: bird6 Config Check
-  ansible.builtin.command:
-    cmd: "birdc6 configure check"
-  register: birdc6_check_out
-  failed_when: '"syntax error" in birdc6_check_out.stdout'
-  when:
-    - not ansible_check_mode
-    - (bird6_filter_config.changed or bird6_bgp_config.changed or bird6_config.changed)
-
-- name: bird6 Config Reload
-  ansible.builtin.command:
-    cmd: "birdc6 configure"
-  register: birdc6_configure
-  when:
-    - not ansible_check_mode
-    - (bird6_filter_config.changed or bird6_bgp_config.changed or bird6_config.changed)
-    - '"Configuration OK" in birdc6_check_out.stdout'
-  changed_when: '"Reconfigured" in birdc6_configure.stdout or "Reconfiguration in progress" in birdc6_configure.stdout'
-  failed_when: '"Reconfigured" not in birdc6_configure.stdout and "Reconfiguration in progress" not in birdc6_configure.stdout'

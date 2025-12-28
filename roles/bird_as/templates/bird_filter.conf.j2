@@ -1,16 +1,27 @@
 # Filter
 
 filter own_subnet_morespec {
-	if net ~ [{{ as_prefix.v4 }}+] then accept;
+{% for prefix in as_prefix.v4 %}
+        if net ~ [{{ prefix }}+] then accept;
+{% endfor %}
+        if net ~ [{{ as_prefix.v6 }}+] then accept;
 	reject;
 }
 
 filter own_subnet {
-	if net = {{ as_prefix.v4 }} then accept;
-	reject;
+{% for prefix in as_prefix.v4 %}
+        if net = {{ prefix }} then accept;
+{% endfor %}
+
+        if source = RTS_STATIC then {
+                if net = {{ as_v6.as_prefix_host_spec }} then accept;
+                if net = {{ as_prefix.v6 }} then accept;
+        }
+
+        reject;
 }
 
-define BOGON_PREFIXES = [
+define BOGON_V4_PREFIXES = [
   0.0.0.0/8+,         # RFC 1122 'this' network
   10.0.0.0/8+,        # RFC 1918 private space
   100.64.0.0/10+,     # RFC 6598 Carrier grade nat space
@@ -24,7 +35,22 @@ define BOGON_PREFIXES = [
   198.51.100.0/24+,   # RFC 5737 TEST-NET-2
   203.0.113.0/24+,    # RFC 5737 TEST-NET-3
   224.0.0.0/4+,       # multicast
-  240.0.0.0/4+ ];     # reserved
+  240.0.0.0/4+        # reserved
+];
+
+define BOGON_V6_PREFIXES = [
+  ::/8+,              # RFC 4291 IPv4-compatible, loopback, et al
+  0100::/64+,         # RFC 6666 Discard-Only
+  2001:2::/48+,       # RFC 5180 BMWG
+  2001:10::/28+,      # RFC 4843 ORCHID
+  2001:db8::/32+,     # RFC 3849 documentation
+  2002::/16+,         # RFC 7526 6to4 anycast relay
+  3ffe::/16+,         # RFC 3701 old 6bone
+  fc00::/7+,          # RFC 4193 unique local unicast
+  fe80::/10+,         # RFC 4291 link local unicast
+  fec0::/10+,         # RFC 3879 old site local unicast
+  ff00::/8+           # RFC 4291 multicast
+];
 
 define BOGON_ASNS = [
   0,                      # RFC 7607
@@ -35,7 +61,8 @@ define BOGON_ASNS = [
   65536..65551,           # RFC 5398 and documentation/example ASNs
   65552..131071,          # RFC IANA reserved ASNs
   4200000000..4294967294, # RFC 6996 Private ASNs
-  4294967295 ];           # RFC 7300 Last 32 bit ASN
+  4294967295              # RFC 7300 Last 32 bit ASN
+];
 
 define TRANSIT_ASNS = [ 174,                  # Cogent
                         701,                  # UUNET
@@ -51,7 +78,9 @@ define TRANSIT_ASNS = [ 174,                  # Cogent
                         6461,                 # Zayo Bandwidth
                         6762,                 # Seabone / Telecom Italia
                         6830,                 # Liberty Global
-                        7018 ];               # AT&T
+                        7018                  # AT&T
+];
+
 
 function reject_transit_paths()
 int set transit_asns;
@@ -66,6 +95,7 @@ int set transit_asns;
 function reject_default_route()
 {
   if net ~ [0.0.0.0/0] then reject;
+  if net ~ [::/0] then reject;
 }
 
 function reject_bogon_asns()
@@ -80,13 +110,23 @@ int set bogon_asns;
 }
 
 function reject_bogon_prefixes()
-prefix set bogon_prefixes;
+prefix set bogon_v4;
+prefix set bogon_v6;
 {
-  bogon_prefixes = BOGON_PREFIXES;
+  if net.type = NET_IP4 then {
+    bogon_v4 = BOGON_V4_PREFIXES;
+    if net ~ bogon_v4 then {
+      print "Reject: IPv4 bogon prefix: ", net, " ", bgp_path;
+      reject;
+    }
+  }
 
-  if (net ~ bogon_prefixes) then {
-    print "Reject: Bogon prefix: ", net, " ", bgp_path;
-    reject;
+  if net.type = NET_IP6 then {
+    bogon_v6 = BOGON_V6_PREFIXES;
+    if net ~ bogon_v6 then {
+      print "Reject: IPv6 bogon prefix: ", net, " ", bgp_path;
+      reject;
+    }
   }
 }
 
@@ -113,6 +153,14 @@ filter ixp_in {
   accept;
 }
 
+filter cix_ixp_in {
+  reject_bogon_asns();
+  reject_bogon_prefixes();
+  reject_default_route();
+  honor_graceful_shutdown();
+  accept;
+}
+
 filter downstream_in {
   reject_bogon_asns();
   reject_bogon_prefixes();
@@ -127,14 +175,6 @@ filter downstream_out {
   reject_bogon_prefixes();
 #  reject_transit_paths();
   reject_default_route(); #Bald erlauben
-  honor_graceful_shutdown();
-  accept;
-}
-
-filter cix_ixp_in {
-  reject_bogon_asns();
-  reject_bogon_prefixes();
-  reject_default_route();
   honor_graceful_shutdown();
   accept;
 }
