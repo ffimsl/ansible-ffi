@@ -6,6 +6,7 @@ iface gre-{{ peer }}
 	tunnel-mode ip6gre
 	tunnel-remote {{ as_tunnel_endpoints[community]["peers"][peer]["gre6_target"] }}
 	tunnel-local {{ as_v6.tunnel_source }}
+	tunnel-ttl 255
 	#
 	mtu 1400
 	address {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) }}
