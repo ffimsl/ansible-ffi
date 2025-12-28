@@ -4,18 +4,47 @@ as_number: 209894
 
 as_prefix:
   v6: "2a14:440::/30"
-  v4: "45.154.111.0/24"
+  v4: "217.70.1.0/24"
 
 as_tunnel_endpoints:
   "Freifunk Muensterland":
     id: 1
     allowed_prefixes:
       v4:
-        - "45.154.111.64/32"
+        - "217.70.1.73/32"
+        - "217.70.1.74/32"
       v6:
         - "2a14:440:1::/48+"
     peers:
-     "rowe":
+     "erpel":
        peer_id: 0
-       gre6_target: "2a01:4f8:171:124a::2"
+       gre6_target: "2a01:4f8:191:21e1::173"
+       remote_as: 209894
+     "enterich":
+       peer_id: 1
+       gre6_target: "2a01:4f8:c17:1442::1"
+       remote_as: 209894
+     "parad0x":
+       peer_id: 2
+       gre6_target: "2a01:4f8:13b:35e8::8"
+       remote_as: 209894
+     "maestria":
+       peer_id: 3
+       gre6_target: "2a01:4f8:221:d16::4"
+       remote_as: 209894
+     "remue-09":
+       peer_id: 4
+       gre6_target: "2a01:4f8:191:21e1::b0"
+       remote_as: 209894
+     "falbala":
+       peer_id: 5
+       gre6_target: "2a01:4f8:221:d15::4"
+       remote_as: 209894
+     "automatix":
+       peer_id: 6
+       gre6_target: "2a01:4f8:202:2086::82"
+       remote_as: 209894
+     "brutus":
+       peer_id: 7
+       gre6_target: "2001:8d8:1801:802b::3"
        remote_as: 209894
