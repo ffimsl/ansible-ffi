@@ -49,3 +49,15 @@ as_tunnel_endpoints:
        peer_id: 7
        gre6_target: "2001:8d8:1801:802b::3"
        remote_as: 209894
+     "soter":
+       peer_id: 8
+       gre6_target: "2a14:440:1200::2"
+       remote_as: 209894
+     "bitschubse":
+       peer_id: 9
+       gre6_target: "2a14:440:2100::2"
+       remote_as: 209894
+     "paketschle":
+       peer_id: 10
+       gre6_target: "2a14:440:2200::2"
+       remote_as: 209894
