@@ -1,0 +1,31 @@
+$TTL 86400
+@   IN  SOA {{ inventory_hostname }}. {{ (item.value.email | default(orga.adminmail)) | replace('@', '.') }}. (
+        {{ ansible_date_time.epoch }} ; serial
+        604800           ; refresh
+        86400            ; retry
+        2419200          ; expire
+        86400            ; minimum
+)
+
+; NS records
+{% for ns in groups['ns_secondary'] | sort %}
+@   IN  NS  {{ ns }}.
+{% endfor %}
+
+{% if item.value.is_ns_zone | default(false) %}
+; Glue records
+{% for ns in (groups['ns_primary'] + groups['ns_secondary']) | unique | sort %}
+{%   if hostvars[ns].ipv4 is defined and hostvars[ns].ipv4 %}
+{{ ns | regex_replace('\.' ~ item.key ~ '$', '') }}   IN  A     {{ hostvars[ns].ipv4 }}
+{%   endif %}
+{%   if hostvars[ns].ipv6 is defined and hostvars[ns].ipv6 %}
+{{ ns | regex_replace('\.' ~ item.key ~ '$', '') }}   IN  AAAA  {{ hostvars[ns].ipv6 }}
+{%   endif %}
+{% endfor %}
+
+{% endif %}
+
+; zone entries
+{% for line in item.value.entries | default([]) %}
+{{ line }}
+{% endfor %}

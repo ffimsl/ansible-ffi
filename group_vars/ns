@@ -1,0 +1,93 @@
+#zones:
+#  "as209894.de":
+#    # optional, Default: false Setzt neben NS Einträgen auch A und AAAA GLUE Einträge.
+#    is_ns_zone: false
+
+#    # optional, Default: orga.adminmail
+#    email: adminteam@infrastruktur.ms
+
+#    # optional: falls gesetzt, ziehen Secondaries diese Zone von genau diesen Primaries
+#    # falls NICHT gesetzt: Primaries = alle Hosts aus Inventory-Gruppe ns_primary
+#    # primary_servers:
+#    #   - { address: "198.51.100.10", port: 53, name: "offsite-hidden-master" }
+#    #   - { address: "2001:db8:1234::10", port: 53, name: "offsite-hidden-master-v6" }
+
+#    entries:
+#       - '@                                                IN  A       212.3.68.147'
+#       - '@                                                IN  AAAA    2a02:1799:9::147'
+#       - 'caddy                                            IN  A       212.3.68.147'
+#       - 'caddy                                            IN  AAAA    2a02:1799:9::147'
+#       - 'ticket                                           IN  CNAME   caddy'
+#       - 'inventar                                         IN  CNAME   caddy'
+#       - 'domaenenwahl                                     IN  CNAME   caddy'
+
+zones:
+  "as209894.de":
+    is_ns_zone: true 
+    entries:
+      - '@                                                IN A     212.3.68.147'
+      - '@                                                IN AAAA  2a02:1799:9::147'
+  "1.70.217.in-addr.arpa":
+    entries:
+      - '64                                               IN PTR  erpel.nat.ffmsl.de.'
+      - '65                                               IN PTR  enterich.nat.ffmsl.de.'
+      - '66                                               IN PTR  parad0x.nat.ffmsl.de.'
+      - '67                                               IN PTR  maestria.nat.ffmsl.de.'
+      - '68                                               IN PTR  remue-09.nat.ffmsl.de.'
+      - '69                                               IN PTR  falbala.nat.ffmsl.de.'
+      - '70                                               IN PTR  automatix.nat.ffmsl.de.'
+      - '71                                               IN PTR  brutus.nat.ffmsl.de.'
+      - '72                                               IN PTR  soter.nat.ffmsl.de.'
+      - '73                                               IN PTR  bitschubse.nat.ffmsl.de.'
+      - '74                                               IN PTR  paketschle.nat.ffmsl.de.'
+      - '129                                              IN PTR  ber-a.as209894.ffi.ms.'
+      - '130                                              IN PTR  nextcloud.ffi.ms.'
+      - '131                                              IN PTR  stats.freifunk-muensterland.de.'
+      - '132                                              IN PTR  collabora.freifunk-muensterland.de.'
+      - '145                                              IN PTR  ber-b.as209894.ffi.ms.'
+      - '146                                              IN PTR  soter.servers.freifunk-muensterland.de.'
+      - '147                                              IN PTR  ns02.as209894.de.'
+      - '158                                              IN PTR  atlas-ber.as209894.ffi.ms.'
+      - '161                                              IN PTR  fra-a.as209894.ffi.ms.'
+      - '162                                              IN PTR  bitschubse.servers.freifunk-muensterland.de.'
+      - '163                                              IN PTR  media-mirror.ffi.ms.'
+      - '164                                              IN PTR  hns-ffi.as209894.ms.'
+      - '177                                              IN PTR  fra-b.as209894.ffi.ms.'
+      - '178                                              IN PTR  paketschleuder.servers.freifunk-muensterland.de.'
+      - '190                                              IN PTR  atlas-fra.as209894.ffi.ms.'
+  "0.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1         IN PTR  ber-a.as209894.ffi.ms.'
+      - '2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1         IN PTR  nextcloud.ffi.ms.'
+      - '3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1         IN PTR  stats.freifunk-muensterland.de.'
+      - '4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1         IN PTR  collabora.freifunk-muensterland.de.'
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.1         IN PTR  ber-b.as209894.ffi.ms.'
+      - '2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.1         IN PTR  soter.servers.freifunk-muensterland.de.'
+      - '4.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.1         IN PTR  atlas-ber.as209894.ffi.ms.'
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.2         IN PTR  fra-a.as209894.ffi.ms.'
+      - '2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.2         IN PTR  bitschubse.servers.freifunk-muensterland.de.'
+      - '3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.2         IN PTR  media-mirror.ffi.ms.'
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.2         IN PTR  fra-b.as209894.ffi.ms.'
+      - '2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.2         IN PTR  paketschleuder.servers.freifunk-muensterland.de.'
+      - '4.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.2         IN PTR  atlas-fra.as209894.ffi.ms.'
+  "1.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         IN PTR  placeholder.ffi.ms.'
+  "2.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         IN PTR  placeholder.ffi.ms.'
+  "3.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         IN PTR  placeholder.ffi.ms.'
+  "4.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         IN PTR  placeholder.ffi.ms.'
+  "5.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         IN PTR  placeholder.ffi.ms.'
+  "6.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         IN PTR  placeholder.ffi.ms.'
+  "7.4.4.0.4.1.a.2.ip6.arpa":
+    entries:
+      - '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0         IN PTR  placeholder.ffi.ms.'

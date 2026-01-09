@@ -1,0 +1,28 @@
+// {{ ansible_managed }}
+
+{% for zonename, zone in zones.items() | sort %}
+
+zone "{{ zonename }}" {
+    type secondary;
+    primaries {
+{% if zone.primary_servers is defined and (zone.primary_servers | length) > 0 %}
+{%   for primary in zone.primary_servers %}
+{%     if primary.address is defined and (primary.address | string | length) > 0 %}
+        {{ primary.address }}{% if primary.port is defined %} port {{ primary.port }}{% endif %};
+{%     endif %}
+{%   endfor %}
+{% else %}
+{%   for host in groups['ns_primary'] %}
+{%     if hostvars[host].ipv4 is defined and (hostvars[host].ipv4 | string | length) > 0 %}
+        {{ hostvars[host].ipv4 }};
+{%     endif %}
+{%     if hostvars[host].ipv6 is defined and (hostvars[host].ipv6 | string | length) > 0 %}
+        {{ hostvars[host].ipv6 }};
+{%     endif %}
+{%   endfor %}
+{% endif %}
+    };
+    file "db.{{ zonename }}";
+};
+
+{% endfor %}
