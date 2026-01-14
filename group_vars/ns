@@ -1,5 +1,7 @@
 #zones:
 #  "as209894.de":
+#    # optional, Default: false Aktiviert DNSSec für diese Zone.
+#    dnssec: false
 #    # optional, Default: false Setzt neben NS Einträgen auch A und AAAA GLUE Einträge.
 #    is_ns_zone: false
 
@@ -23,6 +25,7 @@
 
 zones:
   "as209894.de":
+    dnssec: true
     is_ns_zone: true 
     entries:
       - '@                                                IN A     212.3.68.147'

@@ -20,3 +20,10 @@ options {
   tcp-clients 1000;
   rrset-order { order random; };
 };
+
+dnssec-policy ffi-default {
+    keys {
+        ksk lifetime unlimited algorithm ecdsap256sha256;
+        zsk lifetime 90d algorithm ecdsap256sha256;
+    };
+};

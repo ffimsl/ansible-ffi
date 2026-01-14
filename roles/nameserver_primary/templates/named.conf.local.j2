@@ -6,6 +6,11 @@ zone "{{ zonename }}" {
     type primary;
     file "/var/lib/bind/db.{{ zonename }}";
 
+{% if zone.dnssec is defined and zone.dnssec %}
+    inline-signing yes;
+    dnssec-policy ffi-default;
+
+{%   endif %}
     allow-transfer {
 {% for host in groups['ns_secondary'] %}
 {%   if hostvars[host].ipv4 is defined and hostvars[host].ipv4 %}
