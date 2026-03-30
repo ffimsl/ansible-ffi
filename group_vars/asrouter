@@ -14,50 +14,47 @@ as_tunnel_endpoints:
     allowed_prefixes:
       v4:
         - "45.154.111.64/28"
+        - "217.70.1.64/28"
       v6:
         - "2a14:440:1::/48+"
     peers:
      "erpel":
        peer_id: 0
        gre6_target: "2a01:4f8:191:21e1::173"
-       remote_as: 209894
+       remote_as: 65251
      "enterich":
        peer_id: 1
        gre6_target: "2a01:4f8:c17:1442::1"
-       remote_as: 209894
+       remote_as: 65251
      "parad0x":
        peer_id: 2
        gre6_target: "2a01:4f8:13b:35e8::8"
-       remote_as: 209894
+       remote_as: 65251
      "maestria":
        peer_id: 3
        gre6_target: "2a01:4f8:221:d16::4"
-       remote_as: 209894
+       remote_as: 65251
      "remue-09":
        peer_id: 4
        gre6_target: "2a01:4f8:191:21e1::b0"
-       remote_as: 209894
+       remote_as: 65251
      "falbala":
        peer_id: 5
        gre6_target: "2a01:4f8:221:d15::4"
-       remote_as: 209894
-     "automatix":
-       peer_id: 6
-       gre6_target: "2a01:4f8:202:2086::82"
-       remote_as: 209894
+       remote_as: 65251
      "brutus":
        peer_id: 7
        gre6_target: "2001:8d8:1801:802b::3"
-       remote_as: 209894
-     "soter":
+       remote_as: 65251
+     "gandalf":
        peer_id: 8
        gre6_target: "2a14:440:1200::2"
-       remote_as: 209894
+       remote_as: 65251
      "bitschubse":
        peer_id: 9
        gre6_target: "2a14:440:2100::2"
-       remote_as: 209894
+       remote_as: 65251
      "paketschle":
        peer_id: 10
        gre6_target: "2a14:440:2200::2"
-       remote_as: 209894
+       remote_as: 65251

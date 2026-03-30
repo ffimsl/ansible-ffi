@@ -1,14 +1,14 @@
 ---
 hostname_short: "ber-a"
 
-as_router_id: "45.154.111.129"
+as_router_id: "217.70.1.129"
 
 direct_interfaces:
   - "br-vms"
 
 as_v4:
   cix_local_address: "185.1.74.55"
-  router_prefsrc: "45.154.111.129"
+  router_prefsrc: "217.70.1.129"
   gre_tunnel_transfer_network: "100.127.0.0/22"
   ibgp_cix_address_dict:
     "fra-a":

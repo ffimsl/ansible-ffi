@@ -4,7 +4,7 @@
 auto gre-{{ peer }}
 iface gre-{{ peer }}
 	tunnel-mode ip6gre
-	tunnel-remote {{ as_tunnel_endpoints[community]["peers"][peer]["gre6_target"] }}
+	tunnel-endpoint {{ as_tunnel_endpoints[community]["peers"][peer]["gre6_target"] }}
 	tunnel-local {{ as_v6.tunnel_source }}
 	tunnel-ttl 255
 	#

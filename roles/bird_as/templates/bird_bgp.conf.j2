@@ -23,9 +23,10 @@ template bgp default_ibgp_v6 {
         };
 }
 
-template bgp default_ibgp_downstreams {
+template bgp default_ebgp_downstreams {
         local as {{ as_number }};
         direct;
+        allow bgp_local_pref;
         ipv4 {
                 next hop self;
                 import none;
@@ -43,21 +44,10 @@ template bgp default_ebgp_ixp {
         ipv4 {
                 import filter ixp_in;
                 export filter own_subnet;
+                extended next hop on;
         };
         ipv6 {
                 import filter ixp_in;
-                export filter own_subnet;
-        };
-}
-
-template bgp cix_ebgp_ixp {
-        local as {{ as_number }};
-        ipv4 {
-                import filter cix_ixp_in;
-                export filter own_subnet;
-        };
-        ipv6 {
-                import filter cix_ixp_in;
                 export filter own_subnet;
         };
 }
@@ -81,13 +71,13 @@ template bgp lookingglass {
         ipv6 {
                 add paths tx;
                 import filter { reject; };
-                export filter { accept; };
+                export filter lookingglass_filter;
                 next hop keep;
         };
         ipv4 {
                 add paths tx;
                 import filter { reject; };
-                export filter { accept; };
+                export filter lookingglass_filter;
                 next hop keep;
         };
 }
@@ -142,13 +132,13 @@ protocol bgp ibgp_direct_xcon_{{ ibgp_partner|replace('-','_') }}_v6 from defaul
 {% for community in as_tunnel_endpoints %}
 #{{ community }}
 {% for peer in as_tunnel_endpoints[community]["peers"] %}
-protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }}_v4 from default_ibgp_downstreams {
+protocol bgp ebgp_downstream_tun_{{ peer|replace('-','_') }}_v4 from default_ebgp_downstreams {
 	source address {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('address') }};
 	neighbor {{ as_v4.gre_tunnel_transfer_network | ansible.utils.ipsubnet(31, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('peer') }} as {{ as_tunnel_endpoints[community]["peers"][peer]["remote_as"] }};
 	ipv4 {
 		import filter {
 {% for prefix in as_tunnel_endpoints[community]["allowed_prefixes"]["v4"] %}
-			if net ~ [{{ prefix }}] then accept;
+			if net ~ [{{ prefix }}+] then accept;
 {% endfor %}
 			reject;
 		};
@@ -159,7 +149,7 @@ protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }}_v4 from default_ibg
 	};
 }
 
-protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }}_v6 from default_ibgp_downstreams {
+protocol bgp ebgp_downstream_tun_{{ peer|replace('-','_') }}_v6 from default_ebgp_downstreams {
 	source address {{ as_v6.gre_tunnel_transfer_network | ansible.utils.ipsubnet(127, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('address') }};
 	neighbor {{ as_v6.gre_tunnel_transfer_network | ansible.utils.ipsubnet(127, as_tunnel_endpoints[community]["peers"][peer]["peer_id"]) | ansible.utils.ipaddr('peer') }} as {{ as_tunnel_endpoints[community]["peers"][peer]["remote_as"] }};
 	ipv6 {
@@ -182,8 +172,9 @@ protocol bgp ibgp_downstream_tun_{{ peer|replace('-','_') }}_v6 from default_ibg
 
 # eBGP
 # IXPs
+# Community-IX
 {% if as_v4.ebgp_cix is defined %}{% for ebgp_partner in as_v4.ebgp_cix %}
-protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v4 from cix_ebgp_ixp {
+protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v4 from default_ebgp_ixp {
         source address {{ as_v4.cix_local_address }};
         neighbor {{ as_v4.ebgp_cix[ebgp_partner]['address'] }} as {{ as_v4.ebgp_cix[ebgp_partner]['as'] }};
 {% if as_v4.ebgp_cix[ebgp_partner]['password'] is defined %}
@@ -194,12 +185,36 @@ protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v4 from cix_ebgp_ixp {
 {% endfor %}{% endif %}
 
 {% if as_v6.ebgp_cix is defined %}{% for ebgp_partner in as_v6.ebgp_cix %}
-protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v6 from cix_ebgp_ixp {
+protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v6 from default_ebgp_ixp {
         source address {{ as_v6.cix_local_address }};
         neighbor {{ as_v6.ebgp_cix[ebgp_partner]['address'] }} as {{ as_v6.ebgp_cix[ebgp_partner]['as'] }};
 {% if as_v6.ebgp_cix[ebgp_partner]['password'] is defined %}
         authentication md5;
         password "{{ as_v6.ebgp_cix[ebgp_partner]['password'] }}";
+{% endif %}
+
+}
+{% endfor %}{% endif %}
+
+# BCIX
+{% if as_v4.ebgp_bcix is defined %}{% for ebgp_partner in as_v4.ebgp_bcix %}
+protocol bgp ebgp_bcix_{{ ebgp_partner|replace('-','_') }}_v4 from default_ebgp_ixp {
+        source address {{ as_v4.bcix_local_address }};
+        neighbor {{ as_v4.ebgp_bcix[ebgp_partner]['address'] }} as {{ as_v4.ebgp_bcix[ebgp_partner]['as'] }};
+{% if as_v4.ebgp_bcix[ebgp_partner]['password'] is defined %}
+        authentication md5;
+        password "{{ as_v4.ebgp_bcix[ebgp_partner]['password'] }}";
+{% endif %}
+}
+{% endfor %}{% endif %}
+
+{% if as_v6.ebgp_bcix is defined %}{% for ebgp_partner in as_v6.ebgp_bcix %}
+protocol bgp ebgp_bcix_{{ ebgp_partner|replace('-','_') }}_v6 from default_ebgp_ixp {
+        source address {{ as_v6.bcix_local_address }};
+        neighbor {{ as_v6.ebgp_bcix[ebgp_partner]['address'] }} as {{ as_v6.ebgp_bcix[ebgp_partner]['as'] }};
+{% if as_v6.ebgp_bcix[ebgp_partner]['password'] is defined %}
+        authentication md5;
+        password "{{ as_v6.ebgp_bcix[ebgp_partner]['password'] }}";
 {% endif %}
 
 }

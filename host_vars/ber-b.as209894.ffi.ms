@@ -1,14 +1,13 @@
 ---
 hostname_short: "ber-b"
 
-as_router_id: "45.154.111.145"
+as_router_id: "217.70.1.145"
 
 direct_interfaces:
   - "br-vms"
 
 as_v4:
-  cix_local_address: "185.1.74.57"
-  router_prefsrc: "45.154.111.145"
+  router_prefsrc: "217.70.1.145"
   gre_tunnel_transfer_network: "100.127.4.0/22"
   ibgp_cix_address_dict:
     "fra-a":
@@ -23,6 +22,7 @@ as_v4:
       source: "10.254.2.2"
       address: "10.254.2.1"
 
+  cix_local_address: "185.1.74.57"
   ebgp_cix:
     "rs01":
       address: "185.1.74.1"
@@ -36,8 +36,18 @@ as_v4:
       address: "185.1.74.45"
       as: "9136"
 
+  bcix_local_address: "193.178.185.205"
+  ebgp_bcix:
+    "rs01":
+      address: "193.178.185.5"
+      as: "16374"
+      password: "{{ passwords.bgp.ber_b.bcix_rs }}"
+    "rs02":
+      address: "193.178.185.6"
+      as: "16374"
+      password: "{{ passwords.bgp.ber_b.bcix_rs }}"
+
 as_v6:
-  cix_local_address: "2001:7f8:a5::20:9894:3"
   as_prefix_host_spec: "2a14:440:1000::/36"
   router_prefsrc: "2a14:440:1200::1"
   tunnel_source: "2a14:440:1200::1"
@@ -58,6 +68,7 @@ as_v6:
       address: "fe80::1"
       interface: "eno1"
 
+  cix_local_address: "2001:7f8:a5::20:9894:3"
   ebgp_cix:
     "rs01":
       address: "2001:7f8:a5::5:7555:1"
@@ -70,3 +81,14 @@ as_v6:
     "wobcom":
       address: "2001:7f8:a5::9136:1"
       as: "9136"
+
+  bcix_local_address: "2001:7f8:19:1:0:3:33e6:1"
+  ebgp_bcix:
+    "rs01":
+      address: "2001:7f8:19:1::3ff6:5"
+      as: "16374"
+      password: "{{ passwords.bgp.ber_b.bcix_rs }}"
+    "rs02":
+      address: "2001:7f8:19:1::3ff6:6"
+      as: "16374"
+      password: "{{ passwords.bgp.ber_b.bcix_rs }}"
