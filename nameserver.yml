@@ -1,0 +1,19 @@
+- import_playbook: all.yml
+
+- hosts: ns
+  remote_user: root
+  roles:
+     - role: nameserver_base
+       tags: [nameserver_base, nameserver_primary, nameserver_secondary]
+
+- hosts: ns_primary
+  remote_user: root
+  roles:
+     - role: nameserver_primary
+       tags: [nameserver_primary]
+
+- hosts: ns_secondary
+  remote_user: root
+  roles:
+     - role: nameserver_secondary
+       tags: [nameserver_secondary]

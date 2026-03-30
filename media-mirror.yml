@@ -1,6 +1,6 @@
 - import_playbook: all.yml
 
-- hosts: media-mirror
+- hosts: media_mirror
   vars_files:
     - passwords.yml
   remote_user: root

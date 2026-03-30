@@ -14,6 +14,7 @@ WorkingDirectory=/var/lib/xwiki/
 
 # Environment
 Environment='JETTY_OPTS=-Djetty.http.host=127.0.0.1'
+Environment='XWIKI_OPTS={{ xwiki.memory_xmx | default("-Xmx1024m") }}'
 
 # Lifecycle
 Type=simple

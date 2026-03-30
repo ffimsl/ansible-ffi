@@ -64,3 +64,20 @@ as_v6:
       address: "2001:7f8:a5::5:7555:2"
       as: "57555"
       password: "{{ passwords.bgp.fra_a.cix_rs }}"
+
+  ebgp_lg:
+    "bgptools":
+      description: "bgp.tools Looking Glass"
+      source: "2a14:440:2100::1"
+      address: "2a0c:2f07:9459::b4"
+      as: "212232"
+    "bgp_he_net":
+      description: "he.net Looking Glass"
+      source: "2a14:440:2100::1"
+      address: "2600:7000:1000::7"
+      as: "393338"
+    "bgp_ffi_lg":
+      description: "FFI Fernglas Looking Glass"
+      source: "2a14:440:2100::1"
+      address: "2a02:1799:9::151 port 1179"
+      as: "209894"

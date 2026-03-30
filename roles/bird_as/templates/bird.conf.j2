@@ -1,23 +1,41 @@
 include "bird_filter.conf";
 
-# Router Konfiguration
-
 router id {{ as_router_id }};
 log syslog all;
 
-protocol kernel {
+protocol kernel kernel_v4 {
         scan time 20;
-        import filter own_subnet_morespec; #TODO Extra Filter bauen
-        export filter {
-                if net ~ [0.0.0.0/0] then reject;
-                krt_prefsrc = {{ as_v4.router_prefsrc }};
-                accept;
+
+        ipv4 {
+                import filter own_subnet_morespec;
+                export filter {
+                        if net ~ [0.0.0.0/0] then reject;
+                        krt_prefsrc = {{ as_v4.router_prefsrc }};
+                        accept;
+                };
         };
-        device routes;
+
+        persist;
+}
+
+protocol kernel kernel_v6 {
+        scan time 20;
+
+        ipv6 {
+                import filter own_subnet_morespec;
+                export filter {
+                        if net ~ [::/0] then reject;
+                        krt_prefsrc = {{ as_v6.router_prefsrc }};
+                        accept;
+                };
+        };
+
         persist;
 }
 
 protocol direct {
+        ipv4;
+        ipv6;
 {% if direct_interfaces is defined%}{% for interface in direct_interfaces %}
         interface "{{ interface }}";
 {% endfor %}{% endif %}
@@ -27,12 +45,22 @@ protocol device {
         scan time 10;
 }
 
-protocol static {
-        route {{ as_prefix.v4 }} unreachable;
+protocol static static_v4 {
+        ipv4;
+{% for prefix in as_prefix.v4 %}
+        route {{ prefix }} unreachable;
+{% endfor %}
         route 0.0.0.0/0 unreachable;
+}
+protocol static static_v6 {
+        ipv6;
+        route {{ as_prefix.v6 }} unreachable;
+        route {{ as_v6.as_prefix_host_spec }} unreachable;
+        route ::/0 unreachable;
 }
 
 protocol bfd {
 }
 
 include "bird_bgp.conf";
+include "bird_no_ansible.conf";

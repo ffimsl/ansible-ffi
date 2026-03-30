@@ -1,0 +1,29 @@
+// {{ ansible_managed }}
+
+options {
+  directory "/var/cache/bind";
+
+  dnssec-validation auto;
+
+  listen-on { any; };
+  listen-on-v6 { any; };
+
+  // Autoritativ nach außen
+  allow-query { any; };
+
+  // Kein Resolver
+  recursion no;
+
+  auth-nxdomain no;    # conform to RFC1035
+  minimal-responses yes;
+
+  tcp-clients 1000;
+  rrset-order { order random; };
+};
+
+dnssec-policy ffi-default {
+    keys {
+        ksk lifetime unlimited algorithm ecdsap256sha256;
+        zsk lifetime 90d algorithm ecdsap256sha256;
+    };
+};
