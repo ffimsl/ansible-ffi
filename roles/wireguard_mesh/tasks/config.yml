@@ -1,0 +1,64 @@
+- name: Ensure wireguard package
+  apt:
+    name: wireguard
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Compute automatic IP address from wg_network
+  when: wg_auto_ip
+  set_fact:
+    wg_address: >-
+      {{
+        (hostvars[inventory_hostname].wg_ip |
+         default(
+           (wg_network | ipaddr('network') | ipaddr('add', (inventory_hostname | hash('sha1') | int(base=16)) % (wg_network | ipaddr('size')) - 2)) | ipaddr('address'))
+         )
+      }}/32
+
+- name: Compute wg IPv4 address
+  when: wg_auto_ip
+  set_fact:
+    wg_address: >-
+      {{
+        (hostvars[inventory_hostname].wg_ip |
+          default(
+            (
+              wg_network
+              | ipaddr('network')
+              | ipaddr('add',
+                  (
+                    (inventory_hostname | hash('sha1') | int(base=16))
+                    % (wg_network | ipaddr('size'))
+                  ) | int - 2
+                )
+            ) | ipaddr('address')
+          )
+      }}
+
+- name: Build peers list (all others in group)
+  set_fact:
+    wg_peers: >-
+      {{
+        groups['proxmox']
+        | difference([inventory_hostname])
+        | map('extract', hostvars)
+        | list
+      }}
+
+- name: Render config
+  template:
+    src: wg0.conf.j2
+    dest: "/etc/wireguard/{{ wg_iface }}.conf"
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+  notify: Restart wireguard (wg-quick)
+
+- name: Enable and start wg-quick
+  systemd:
+    name: "wg-quick@{{ wg_iface }}"
+    enabled: true
+    state: started
+  become: true

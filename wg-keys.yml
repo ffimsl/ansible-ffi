@@ -1,0 +1,8 @@
+wireguard:
+  proxmox:
+    msr-a.srv.ffi.ms:
+      privatkey: CNS0mlT4aRbg5XpSN8JdasiGcev93Z3HBMgsS+3n+UA=
+      publickey: inZwEA+YhOMd/H7Ws6jKhdS0PLz2+EpgPuE4HwLDsAw=
+    remue.srv.ffi.ms:
+      privatkey: iI6HiVqD5QAqnfO6jRBoRBIHBz+EZHGOt4dD9u7XFmo=
+      publickey: y4024ISSl4Rw8HnDfQmXGVkHiFJqDxrqiUeZDd+RPTg=

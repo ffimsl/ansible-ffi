@@ -1,0 +1,28 @@
+# Interface/Netz
+wg_iface: wg0
+wg_network: 172.16.123.0/24
+wg_port: 51820
+
+# pro Host eindeutige /32-IP im wg_network
+# Entweder pro Host setzen: host_vars/<host>.yml -> wg_ip: 172.16.123.x
+# oder automatische, stabile Ableitung (Hash) aktivieren:
+wg_auto_ip: true
+
+# Endpunkt (extern erreichbarer FQDN/IP) je Host:
+# host_vars/<host>.yml -> wg_endpoint: "host.example.org"
+# Falls nicht gesetzt, wird kein Endpoint eingetragen (z.B. nur intern)
+
+# zusätzliche LANs, die über den jeweiligen Host erreichbar sind:
+# host_vars/<host>.yml -> wg_lans: [ "192.168.10.0/24", "fd00:1::/64" ]
+wg_lans: []
+
+# Pfad zur Vault-Datei mit den Keys
+wg_keys_vault_file: "wg-keys.yml"
+
+# Automatisches Aktualisieren/Anlegen der Vault-Datei
+# Benötigt vault_password_file wenn über ansible-vault CLI verschlüsselt wird.
+wg_manage_vault: true
+vault_password_file: ""   # z.B. "~/.ansible/vault_pass.txt" (optional)
+
+# Systemd automatisch (re)starten
+wg_restart_on_change: true

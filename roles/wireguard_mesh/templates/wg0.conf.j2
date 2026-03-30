@@ -1,0 +1,39 @@
+[Interface]
+Address = {{ wg_address }}/24
+ListenPort = {{ wg_port }}
+PrivateKey = {{ wg_privkey }}
+
+{% for peer in wg_peers %}
+# {{ peer.inventory_hostname }}
+[Peer]
+PublicKey = {{ wg_vault_data.wireguard.proxmox[peer.inventory_hostname].publickey }}
+{% set peer_ip = (peer.wg_ip | default('172.16.123.' ~ (((peer.inventory_hostname | hash('sha1')) | int(base=16)) % 200 + 10))) %}
+AllowedIPs = {{ peer_ip }}/32{% for lan in (peer.wg_lans | default([])) %}, {{ lan }}{% endfor %}
+{% if peer.wg_endpoint is defined and peer.wg_endpoint %}
+Endpoint = {{ peer.wg_endpoint }}:{{ peer.wg_port|default(wg_port) }}
+PersistentKeepalive = 25
+{% endif %}
+
+{% endfor %}
+
+{% for peer_name in wg_peers %}
+{% set peer_ipv4 =
+  (hostvars[peer_name].wg_ip
+    | default(
+        (wg_network
+          | ipaddr('network')
+          | ipaddr('add',
+              ((peer_name | hash('sha1') | int(base=16)) % (wg_network | ipaddr('size'))) - 2
+            )
+        ) | ipaddr('address')
+      )
+)%}
+
+# {{ peer_name }}
+[Peer]
+PublicKey = {{ wg_vault_data.wireguard.proxmox[peer_name].publickey }}
+AllowedIPs = {{ peer_ipv4 }}/32{% for lan in (hostvars[peer_name].wg_lans | default([])) %}, {{ lan }}{% endfor %}
+Endpoint = {{ peer_name }}:{{ hostvars[peer_name].wg_port | default(wg_port) }}
+PersistentKeepalive = 25
+
+{% endfor %}

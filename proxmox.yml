@@ -3,6 +3,7 @@
 - hosts: proxmox
   vars_files:
     - passwords.yml
+    - wg-keys.yml
   remote_user: root
 #  roles:
-#    - { role: pve_zfs, tags: "pve_zfs" }
+#    - { role: wireguard_mesh, tags: "wireguard_mesh" }

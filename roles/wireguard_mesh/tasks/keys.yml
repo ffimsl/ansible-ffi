@@ -1,0 +1,132 @@
+# Diese Datei läuft auf dem Controller (localhost), weil wir die Vault-Datei dort pflegen.
+- name: Gather group hosts order
+  set_fact:
+    wg_group_hosts: "{{ groups['proxmox'] | sort }}"
+
+- name: Load existing keys (if any)
+  vars:
+    # Wir laden die Variablen aus der Vault-Datei (wenn vorhanden).
+    # Falls die Datei noch nicht existiert, ignorieren wir den Fehler.
+    vf: "{{ wg_keys_vault_file }}"
+  include_vars:
+    file: "{{ vf }}"
+    name: wg_vault_data
+  ignore_errors: true
+  delegate_to: localhost
+  run_once: true
+
+- name: Ensure base structure
+  set_fact:
+    wg_vault_data: "{{ wg_vault_data | default({}) }}"
+  delegate_to: localhost
+  run_once: true
+
+- name: Initialize group subtree
+  set_fact:
+    wg_vault_data: >-
+      {{
+        wg_vault_data |
+        combine({'wireguard': (wg_vault_data.wireguard|default({})) |
+                 combine({ 'proxmox': (wg_vault_data.wireguard.proxmox|default({})) }) }, recursive=True)
+      }}
+  delegate_to: localhost
+  run_once: true
+
+# Für jeden Host prüfen/generieren wir Keys, falls noch nicht vorhanden.
+# 1) Private Keys erzeugen (nur wenn Eintrag fehlt)
+- name: Generate private key if missing
+  command: wg genkey
+  register: gen_priv
+  changed_when: true
+  when:
+#    - not ansible_check_mode
+    - (wg_vault_data.wireguard.proxmox[item] is not defined)
+  delegate_to: localhost
+  run_once: true
+  loop: "{{ wg_group_hosts }}"
+  loop_control:
+    label: "{{ item }}"
+
+# 2) Public Keys aus der vorher erzeugten privaten ableiten
+- name: Derive public key from generated private key
+  command: bash -lc "printf '%s' '{{ gen_priv.results[loop.index0].stdout | default('') }}' | wg pubkey"
+  register: gen_pub
+  changed_when: true
+  when:
+#    - not ansible_check_mode
+    - (wg_vault_data.wireguard.proxmox[item] is not defined)
+  delegate_to: localhost
+  run_once: true
+  loop: "{{ wg_group_hosts }}"
+  loop_control:
+    label: "{{ item }}"
+
+# 3) Struktur zusammenführen (neu erzeugte Paare eintragen)
+- name: Merge generated keys into structure
+  set_fact:
+    wg_vault_data: >-
+      {{
+        wg_vault_data |
+        combine({'wireguard':
+          wg_vault_data.wireguard |
+          combine({'proxmox':
+            (wg_vault_data.wireguard.proxmox |
+              combine({ item: {
+                'privatkey': (gen_priv.results[loop.index0].stdout),
+                'publickey': (gen_pub.results[loop.index0].stdout)
+              }}, recursive=True)
+            )}, recursive=True)
+        }}, recursive=True)
+      }}
+  when:
+#    - not ansible_check_mode
+    - (wg_vault_data.wireguard.proxmox[item] is not defined)
+  delegate_to: localhost
+  run_once: true
+  loop: "{{ wg_group_hosts }}"
+  loop_control:
+    label: "{{ item }}"
+
+# Vault-Datei nur wirklich schreiben/verschlüsseln, wenn wir nicht im Check-Mode sind
+- name: Write (plain) temp file with updated keys (controller)
+  copy:
+    dest: "{{ wg_keys_vault_file }}.tmp"
+    content: "{{ wg_vault_data | to_nice_yaml }}"
+    mode: '0600'
+  when:
+    - wg_manage_vault
+    - not ansible_check_mode
+  delegate_to: localhost
+  run_once: true
+
+- name: Encrypt temp file into final vault file (controller)
+  vars:
+    vault_cmd: >-
+      ansible-vault encrypt --output {{ wg_keys_vault_file }} {{ wg_keys_vault_file }}.tmp
+  command: >-
+    {{ vault_cmd }}{% if vault_password_file|length > 0 %} --vault-password-file {{ vault_password_file }}{% endif %}
+  args:
+    chdir: "{{ playbook_dir }}"
+  changed_when: true
+  when:
+    - wg_manage_vault
+    - not ansible_check_mode
+  delegate_to: localhost
+  run_once: true
+
+- name: Remove temp file
+  file:
+    path: "{{ wg_keys_vault_file }}.tmp"
+    state: absent
+  when:
+    - wg_manage_vault
+    - not ansible_check_mode
+  delegate_to: localhost
+  run_once: true
+
+# Ab hier: pro Host die Keys aus wg_vault_data in Hostvars verfügbar machen
+- name: Expose current host keys as facts
+  set_fact:
+    wg_privkey: "{{ wg_vault_data.wireguard.proxmox[inventory_hostname].privatkey }}"
+    wg_pubkey:  "{{ wg_vault_data.wireguard.proxmox[inventory_hostname].publickey }}"
+#  no_log: true

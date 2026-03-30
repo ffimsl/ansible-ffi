@@ -1,0 +1,6 @@
+- name: Restart wireguard (wg-quick)
+  when: wg_restart_on_change
+  become: true
+  systemd:
+    name: "wg-quick@{{ wg_iface }}"
+    state: restarted

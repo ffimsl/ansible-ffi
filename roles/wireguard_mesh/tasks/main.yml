@@ -1,0 +1,5 @@
+- name: Include key management
+  import_tasks: keys.yml
+
+- name: Include config deployment
+  import_tasks: config.yml
