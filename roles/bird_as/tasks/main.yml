@@ -16,6 +16,12 @@
     dest: /etc/bird/bird_filter.conf
   register: bird_filter_config
 
+- name: bird_rpki.conf Konfigruation
+  ansible.builtin.template:
+    src: bird_rpki.conf.j2
+    dest: /etc/bird/bird_rpki.conf
+  register: bird_rpki_config
+
 - name: bird.conf Konfigruation
   ansible.builtin.template:
     src: bird.conf.j2
@@ -35,7 +41,7 @@
   failed_when: '"syntax error" in birdc_check_out.stdout'
   when:
     - not ansible_check_mode
-    - (bird_filter_config.changed or bird_bgp_config.changed or bird_config.changed)
+    - (bird_filter_config.changed or bird_bgp_config.changed or bird_config.changed or bird_rpki_config.changed)
 
 - name: bird Config Reload
   ansible.builtin.command:
@@ -43,7 +49,7 @@
   register: birdc_configure
   when:
     - not ansible_check_mode
-    - (bird_filter_config.changed or bird_bgp_config.changed or bird_config.changed)
+    - (bird_filter_config.changed or bird_bgp_config.changed or bird_config.changed or bird_rpki_config.changed)
     - '"Configuration OK" in birdc_check_out.stdout'
   changed_when: '"Reconfigured" in birdc_configure.stdout or "Reconfiguration in progress" in birdc_configure.stdout'
   failed_when: '"Reconfigured" not in birdc_configure.stdout and "Reconfiguration in progress" not in birdc_configure.stdout'

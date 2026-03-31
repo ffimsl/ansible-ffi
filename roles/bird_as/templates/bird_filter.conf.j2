@@ -145,16 +145,60 @@ prefix set bogon_v6;
   }
 }
 
+function reject_small_prefixes()
+{
+  if net.type = NET_IP4 then {
+    if net.len > 24 then {
+      print "Reject: Too specific IPv4 prefix:", net, " ", bgp_path;
+      reject;
+    }
+  }
+
+  if net.type = NET_IP6 then {
+    if net.len > 48 then {
+      print "Reject: Too specific IPv6 prefix: ", net, " ", bgp_path;
+      reject;
+    }
+  }
+}
+
+function reject_long_aspaths()
+{
+    if ( bgp_path.len > 100 ) then {
+        print "Reject: Too long AS path: ", net, " ", bgp_path;
+        reject;
+    }
+}
+
 function honor_graceful_shutdown() {
   if (65535, 0) ~ bgp_community then {
     bgp_local_pref = 0;
   }
 }
 
+function reject_invalid_rpki() {
+  if net.type = NET_IP4 then {
+    if roa_check(rpki_roas4, net, bgp_path.last) = ROA_INVALID then {
+      print "DRYRUN Reject: RPKI invalid: ", net, " ", bgp_path;
+#      reject;
+    }
+  }
+  if net.type = NET_IP6 then {
+    if roa_check(rpki_roas6, net, bgp_path.last) = ROA_INVALID then {
+      print "DRYRUN Reject: RPKI invalid: ", net, " ", bgp_path;
+#      reject;
+    }
+  }
+}
+
+
 filter transit_in {
   reject_bogon_asns();
   reject_bogon_prefixes();
+  reject_long_aspaths();
+  reject_small_prefixes();
   reject_default_route();
+  reject_invalid_rpki();
   honor_graceful_shutdown();
   accept;
 }
@@ -162,7 +206,11 @@ filter transit_in {
 filter ixp_in {
   reject_bogon_asns();
   reject_bogon_prefixes();
+  reject_long_aspaths();
+  reject_transit_paths();
+  reject_small_prefixes();
   reject_default_route();
+  reject_invalid_rpki();
   honor_graceful_shutdown();
   accept;
 }

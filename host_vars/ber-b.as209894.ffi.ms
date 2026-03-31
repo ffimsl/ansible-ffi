@@ -46,6 +46,24 @@ as_v4:
       address: "193.178.185.6"
       as: "16374"
       password: "{{ passwords.bgp.ber_b.bcix_rs }}"
+    "globalnoc":
+      address: "193.178.185.90"
+      as: "25220"
+      max_pref: "50"
+      disabled: true
+    "apple1":
+      address: "193.178.185.19"
+      as: "714"
+      max_pref: "10000"
+    "apple2":
+      address: "193.178.185.24"
+      as: "714"
+      max_pref: "10000"
+    "henet":
+      address: "193.178.185.34"
+      as: "6939"
+      max_pref: "215000"
+      disabled: true
 
 as_v6:
   as_prefix_host_spec: "2a14:440:1000::/36"
@@ -92,3 +110,21 @@ as_v6:
       address: "2001:7f8:19:1::3ff6:6"
       as: "16374"
       password: "{{ passwords.bgp.ber_b.bcix_rs }}"
+    "globalnoc":
+      address: "2001:7f8:19:1::6284:1"
+      as: "25220"
+      max_pref: "10"
+      disabled: true
+    "apple1":
+      address: "2001:7f8:19:1::2ca:1"
+      as: "714"
+      max_pref: "1000"
+    "apple2":
+      address: "2001:7f8:19:1::2ca:2"
+      as: "714"
+      max_pref: "1000"
+    "henet":
+      address: "2001:7f8:19:1::1b1b:1"
+      as: "6939"
+      max_pref: "237000"
+      disabled: true

@@ -1,0 +1,20 @@
+roa4 table rpki_roas4;
+roa6 table rpki_roas6;
+
+protocol rpki routinator {
+  roa4 { table rpki_roas4; };
+  roa6 { table rpki_roas6; };
+  remote "routinator.as209894.ffi.ms" port 3323;
+  retry keep 90;
+  refresh keep 900;
+  expire keep 172800;
+}
+
+protocol rpki cloudflare {
+  roa4 { table rpki_roas4; };
+  roa6 { table rpki_roas6; };
+  remote "rtr.rpki.cloudflare.com" port 8282;
+  retry keep 90;
+  refresh keep 900;
+  expire keep 172800;
+}
