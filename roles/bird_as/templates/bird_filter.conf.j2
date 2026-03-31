@@ -179,8 +179,8 @@ function honor_graceful_shutdown() {
 function reject_invalid_rpki() {
   if net.type = NET_IP4 then {
     if roa_check(rpki_roas4, net, bgp_path.last) = ROA_INVALID then {
-      print "DRYRUN Reject: RPKI invalid: ", net, " ", bgp_path;
-#      reject;
+      print "Reject: RPKI invalid: ", net, " ", bgp_path;
+      reject;
     }
   }
   if net.type = NET_IP6 then {
