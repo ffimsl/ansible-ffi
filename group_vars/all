@@ -7,6 +7,7 @@ ssh_keys:
   - name: "wurmi"
   - name: "robwei"
   - name: "jbergner"
+  - name: "entepotenz"
 #  - name: "musteradmin"
 #    command: "no-agent-forwarding,no-port-forwarding,no-pty,no-user-rc,no-X11-forwarding"
 
