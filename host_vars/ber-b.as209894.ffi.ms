@@ -66,6 +66,14 @@ as_v4:
       address: "193.178.185.17"
       as: "13335"
       max_pref: "80000"
+    "meta1":
+      address: "193.178.185.117"
+      as: "32934"
+      max_pref: "100"
+    "meta2":
+      address: "193.178.185.118"
+      as: "32934"
+      max_pref: "100"
 
 as_v6:
   as_prefix_host_spec: "2a14:440:1000::/36"
@@ -132,3 +140,11 @@ as_v6:
       address: "2001:7f8:19:1::3417:1"
       as: "13335"
       max_pref: "30000"
+    "meta1":
+      address: "2001:7f8:19:1::80a6:1"
+      as: "32934"
+      max_pref: "100"
+    "meta2":
+      address: "2001:7f8:19:1::80a6:2"
+      as: "32934"
+      max_pref: "100"
