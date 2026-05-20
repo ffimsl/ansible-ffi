@@ -50,7 +50,6 @@ as_v4:
       address: "193.178.185.90"
       as: "25220"
       max_pref: "50"
-      disabled: true
     "apple1":
       address: "193.178.185.19"
       as: "714"
@@ -63,7 +62,10 @@ as_v4:
       address: "193.178.185.34"
       as: "6939"
       max_pref: "215000"
-      disabled: true
+    "cloudflare":
+      address: "193.178.185.17"
+      as: "13335"
+      max_pref: "80000"
 
 as_v6:
   as_prefix_host_spec: "2a14:440:1000::/36"
@@ -114,7 +116,6 @@ as_v6:
       address: "2001:7f8:19:1::6284:1"
       as: "25220"
       max_pref: "10"
-      disabled: true
     "apple1":
       address: "2001:7f8:19:1::2ca:1"
       as: "714"
@@ -127,4 +128,7 @@ as_v6:
       address: "2001:7f8:19:1::1b1b:1"
       as: "6939"
       max_pref: "237000"
-      disabled: true
+    "cloudflare":
+      address: "2001:7f8:19:1::3417:1"
+      as: "13335"
+      max_pref: "30000"
