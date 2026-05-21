@@ -74,6 +74,14 @@ as_v4:
       address: "193.178.185.118"
       as: "32934"
       max_pref: "100"
+    "aws1":
+      address: "193.178.185.95"
+      as: "16509"
+      max_pref: "16000"
+    "aws2":
+      address: "193.178.185.195"
+      as: "16509"
+      max_pref: "16000"
 
 as_v6:
   as_prefix_host_spec: "2a14:440:1000::/36"
@@ -148,3 +156,11 @@ as_v6:
       address: "2001:7f8:19:1::80a6:2"
       as: "32934"
       max_pref: "100"
+    "aws1":
+      address: "2001:7f8:19:1::407d:1"
+      as: "16509"
+      max_pref: "8000"
+    "aws2":
+      address: "2001:7f8:19:1::407d:2"
+      as: "16509"
+      max_pref: "8000"
