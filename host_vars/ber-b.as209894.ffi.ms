@@ -82,6 +82,10 @@ as_v4:
       address: "193.178.185.195"
       as: "16509"
       max_pref: "16000"
+    "netflix":
+      address: "193.178.185.80"
+      as: "2906"
+      max_pref: "250"
 
 as_v6:
   as_prefix_host_spec: "2a14:440:1000::/36"
@@ -164,3 +168,24 @@ as_v6:
       address: "2001:7f8:19:1::407d:2"
       as: "16509"
       max_pref: "8000"
+    "netflix":
+      address: "2001:7f8:19:1::b5a:1"
+      as: "2906"
+      max_pref: "250"
+
+  ebgp_lg:
+    "bgptools":
+      description: "bgp.tools Looking Glass"
+      source: "2a14:440:1200::1"
+      address: "2a0c:2f07:9459::b19"
+      as: "212232"
+    "bgp_he_net":
+      description: "he.net Looking Glass"
+      source: "2a14:440:1200::1"
+      address: "2600:7000:1000::12"
+      as: "393338"
+    "bgp_ffi_lg":
+      description: "FFI Fernglas Looking Glass"
+      source: "2a14:440:1200::1"
+      address: "2a02:1799:9::151 port 1179"
+      as: "209894"
