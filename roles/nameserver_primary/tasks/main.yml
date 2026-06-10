@@ -1,5 +1,13 @@
 ---
 
+- name: BIND Zones-Folder
+  ansible.builtin.file:
+    path: /etc/bind/zones/
+    state: directory
+    recurse: yes
+    owner: root
+    group: bind
+
 - name: Deploy named.conf
   template:
     src: named.conf.j2
@@ -20,8 +28,8 @@
 
 - name: Deploy named.conf.local
   template:
-    src: named.conf.local.j2
-    dest: /etc/bind/named.conf.local
+    src: zones.ffi.conf.j2
+    dest: /etc/bind/zones/zones.ffi.conf
     owner: root
     group: bind
     mode: "0644"
