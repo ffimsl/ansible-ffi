@@ -5,7 +5,6 @@ as_number: 209894
 as_prefix:
   v6: "2a14:440::/30"
   v4: 
-    - "45.154.111.0/24"
     - "217.70.1.0/24"
 
 as_tunnel_endpoints:
@@ -13,7 +12,6 @@ as_tunnel_endpoints:
     id: 1
     allowed_prefixes:
       v4:
-        - "45.154.111.64/28"
         - "217.70.1.64/28"
       v6:
         - "2a14:440:1::/48+"
