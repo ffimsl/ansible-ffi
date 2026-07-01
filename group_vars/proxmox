@@ -1,1 +1,4 @@
 keep_rpcbind_installed: true
+
+additional_ssh_keys:
+  - name: "entepotenz"
