@@ -82,6 +82,14 @@ as_v4:
       address: "193.178.185.195"
       as: "16509"
       max_pref: "16000"
+    "zayo6461":
+      address: "193.178.185.198"
+      as: "6461"
+      max_pref: "250000"
+    "zayo8218":
+      address: "193.178.185.202"
+      as: "8218"
+      max_pref: "5000"
 
 as_v6:
   as_prefix_host_spec: "2a14:440:1000::/36"
@@ -164,3 +172,11 @@ as_v6:
       address: "2001:7f8:19:1::407d:2"
       as: "16509"
       max_pref: "8000"
+    "zayo6461":
+      address: "2001:7f8:19:1::193d:1"
+      as: "6461"
+      max_pref: "60000"
+    "zayo8218":
+      address: "2001:7f8:19:1::201a:1"
+      as: "8218"
+      max_pref: "1000"
