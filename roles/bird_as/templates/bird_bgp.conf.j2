@@ -189,7 +189,7 @@ protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v6 {
         };
         ipv6 {
 {% if as_v6.ebgp_cix[ebgp_partner]['max_pref'] is defined %}
-                receive limit {{ as_v6.ebgp_cix[ebgp_partner]['max_pref'] }}" action block;
+                receive limit {{ as_v6.ebgp_cix[ebgp_partner]['max_pref'] }} action block;
 {% endif %}
                 import filter transit_in;
                 export filter own_subnet;
@@ -206,61 +206,69 @@ protocol bgp ebgp_cix_{{ ebgp_partner|replace('-','_') }}_v6 {
 
 # BCIX
 {% if as_v4.ebgp_bcix is defined %}{% for ebgp_partner in as_v4.ebgp_bcix %}
+{% set peer = as_v4.ebgp_bcix[ebgp_partner] %}
 protocol bgp ebgp_bcix_{{ ebgp_partner|replace('-','_') }}_v4 {
         local as {{ as_number }};
         source address {{ as_v4.bcix_local_address }};
-        neighbor {{ as_v4.ebgp_bcix[ebgp_partner]['address'] }} as {{ as_v4.ebgp_bcix[ebgp_partner]['as'] }};
-        ipv4 {
-{% if as_v4.ebgp_bcix[ebgp_partner]['max_pref'] is defined %}
-                receive limit {{ as_v4.ebgp_bcix[ebgp_partner]['max_pref'] }} action block;
+        neighbor {{ peer['address'] }} as {{ peer['as'] }};
+{% if peer['as'] | string not in ['16374', '57555'] %}
+        enforce first as on;
 {% endif %}
-                import filter ixp_in;
+        ipv4 {
+{% if peer['max_pref'] is defined %}
+                receive limit {{ peer['max_pref'] }} action block;
+{% endif %}
+                import filter {{ peer['import_filter'] | default('ixp_in') }};
                 export filter own_subnet;
         };
         ipv6 {
                 import none;
                 export none;
         };
-{% if as_v4.ebgp_bcix[ebgp_partner]['password'] is defined %}
+{% if peer['password'] is defined %}
         authentication md5;
-        password "{{ as_v4.ebgp_bcix[ebgp_partner]['password'] }}";
+        password "{{ peer['password'] }}";
 {% endif %}
-{% if as_v4.ebgp_bcix[ebgp_partner]['disabled'] is defined and as_v4.ebgp_bcix[ebgp_partner]['disabled'] %}
+{% if peer['disabled'] | default(false) %}
         disabled;
 {% endif %}
 }
 {% endfor %}{% endif %}
 
 {% if as_v6.ebgp_bcix is defined %}{% for ebgp_partner in as_v6.ebgp_bcix %}
+{% set peer = as_v6.ebgp_bcix[ebgp_partner] %}
+{% set peer_v4 = as_v4.ebgp_bcix[ebgp_partner] | default({}) %}
 protocol bgp ebgp_bcix_{{ ebgp_partner|replace('-','_') }}_v6 {
         local as {{ as_number }};
         source address {{ as_v6.bcix_local_address }};
-        neighbor {{ as_v6.ebgp_bcix[ebgp_partner]['address'] }} as {{ as_v6.ebgp_bcix[ebgp_partner]['as'] }};
-        ipv4 {
-{% if as_v4.ebgp_bcix[ebgp_partner]['max_pref'] is defined %}
-                receive limit {{ as_v4.ebgp_bcix[ebgp_partner]['max_pref'] }} action block;
+        neighbor {{ peer['address'] }} as {{ peer['as'] }};
+{% if peer['as'] | string not in ['16374', '57555'] %}
+        enforce first as on;
 {% endif %}
-                import filter ixp_in;
+        ipv4 {
+{% if peer_v4['max_pref'] is defined %}
+                receive limit {{ peer_v4['max_pref'] }} action block;
+{% endif %}
+                import filter {{ peer['import_filter'] | default('ixp_in') }};
                 export filter own_subnet;
                 extended next hop on;
         };
         ipv6 {
-{% if as_v6.ebgp_bcix[ebgp_partner]['max_pref'] is defined %}
-                receive limit {{ as_v6.ebgp_bcix[ebgp_partner]['max_pref'] }} action block;
+{% if peer['max_pref'] is defined %}
+                receive limit {{ peer['max_pref'] }} action block;
 {% endif %}
-                import filter ixp_in;
+                import filter {{ peer['import_filter'] | default('ixp_in') }};
                 export filter own_subnet;
         };
-{% if as_v6.ebgp_bcix[ebgp_partner]['password'] is defined %}
+{% if peer['password'] is defined %}
         authentication md5;
-        password "{{ as_v6.ebgp_bcix[ebgp_partner]['password'] }}";
+        password "{{ peer['password'] }}";
 {% endif %}
-{% if as_v6.ebgp_bcix[ebgp_partner]['disabled'] is defined and as_v6.ebgp_bcix[ebgp_partner]['disabled'] %}
+{% if peer['disabled'] | default(false) %}
         disabled;
 {% endif %}
 }
 {% endfor %}{% endif %}
-
 
 # eBGP
 # Looking-glasses
