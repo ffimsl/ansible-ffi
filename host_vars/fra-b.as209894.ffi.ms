@@ -71,6 +71,11 @@ as_v6:
       source: "2a14:440:2200::1"
       address: "2a0c:2f07:9459::b14"
       as: "212232"
+    "bgp_he_net":
+      description: "he.net Looking Glass"
+      source: "2a14:440:2200::1"
+      address: "2600:7000:1000::13"
+      as: "393338"
     "bgp_ffi_lg":
       description: "FFI Fernglas Looking Glass"
       source: "2a14:440:2200::1"
