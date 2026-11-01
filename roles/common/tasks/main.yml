@@ -49,7 +49,7 @@
   when: "keep_rpcbind_installed is not defined or (keep_rpcbind_installed is defined and keep_rpcbind_installed == false)"
 
 - name: Unterstützung für deutsche Sprache aktivieren
-  ansible.builtin.locale_gen: name=de_DE.UTF-8 state=present
+  community.general.locale_gen: name=de_DE.UTF-8 state=present
 
 - name: "Get all files in /etc/logrotate.d/"
   ansible.builtin.raw: find /etc/logrotate.d/ -type f
