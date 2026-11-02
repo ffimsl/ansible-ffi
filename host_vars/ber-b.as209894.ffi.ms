@@ -1,4 +1,7 @@
 ---
+unattended_upgrades:
+  enabled: false	#Updates erstmal nur auf den A-Routern testen um zu sehen ob es kaputt geht.
+
 hostname_short: "ber-b"
 
 as_router_id: "217.70.1.145"

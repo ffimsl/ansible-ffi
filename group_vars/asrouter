@@ -1,4 +1,6 @@
 ---
+unattended_upgrades:
+  reboot_mode: "none"
 
 as_number: 209894
 
