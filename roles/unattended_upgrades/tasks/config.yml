@@ -1,0 +1,28 @@
+---
+- name: Merge unattended_upgrades config with defaults
+  set_fact:
+    _uu: "{{ unattended_upgrades_defaults | combine(unattended_upgrades | default({}), recursive=True) }}"
+
+- name: Check unattended_upgrades config
+  assert:
+    that:
+      - (unattended_upgrades | default({})) is mapping
+      - (unattended_upgrades | default({})).keys() | list | difference(unattended_upgrades_defaults.keys() | list) | length == 0
+      - _uu.reboot_mode in _uu_allowed_reboot_modes
+      - _uu.mail_report in _uu_allowed_mail_reports
+      - _uu.origins_pattern is sequence and _uu.origins_pattern is not string
+      - _uu.package_blacklist is sequence and _uu.package_blacklist is not string
+    fail_msg: >-
+      Ungültige Konfiguration in unattended_upgrades.
+      Unbekannte Keys: {{ (unattended_upgrades | default({})).keys() | list | difference(unattended_upgrades_defaults.keys() | list) }}.
+      Erlaubte Keys: {{ unattended_upgrades_defaults.keys() | list | sort }}.
+      reboot_mode: {{ _uu_allowed_reboot_modes }}, mail_report: {{ _uu_allowed_mail_reports }}.
+    quiet: yes
+
+- name: Warn if no update source is enabled
+  debug:
+    msg: "Keine Quelle aktiv (include_*/origins_pattern), unattended-upgrades installiert nichts."
+  when:
+    - _uu.enabled
+    - not (_uu.include_security or _uu.include_updates or _uu.include_point_releases)
+    - _uu.origins_pattern | length == 0

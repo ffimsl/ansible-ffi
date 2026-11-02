@@ -1,0 +1,23 @@
+---
+# Alt: 10periodic aus dem alten Template (nur entfernen, wenn unverändert und von keinem Paket besessen)
+- name: Stat old 10periodic
+  stat:
+    path: /etc/apt/apt.conf.d/10periodic
+  register: _uu_old10
+
+- name: Check package ownership of 10periodic
+  command: dpkg -S /etc/apt/apt.conf.d/10periodic
+  register: _uu_old10_owner
+  changed_when: false
+  failed_when: false
+  check_mode: no
+  when: _uu_old10.stat.exists
+
+- name: Remove old role-managed 10periodic
+  file:
+    path: /etc/apt/apt.conf.d/10periodic
+    state: absent
+  when:
+    - _uu_old10.stat.exists
+    - _uu_old10.stat.checksum == _uu_old_10periodic_sha1
+    - _uu_old10_owner.rc != 0
