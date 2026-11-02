@@ -28,3 +28,6 @@ orga:
 
 server_besitzer: "{{ orga.name }}"
 #server_aufgabe: "Super-Server für super wichtige Aufgaben"
+
+patchmon:
+  server: "https://patchmon.ffi.ms"
