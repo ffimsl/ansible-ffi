@@ -1,0 +1,45 @@
+---
+# Nutzer setzen nur die zu ändernden Keys in "unattended_upgrades"
+# (host_vars/group_vars). Gemergt wird in tasks/config.yml nach "_uu".
+unattended_upgrades: {}
+
+unattended_upgrades_defaults:
+  # Hauptschalter. false = unattended-upgrades aktiv deaktivieren
+  # (20auto-upgrades auf "0", Drop-ins/Cron entfernen), Paket bleibt installiert.
+  enabled: true
+
+  # --- Quellen ---
+  # Die 52er verwirft die Paketliste immer (#clear) und listet die Quellen explizit auf.
+  # Security-Updates (Debian-Security bzw. Ubuntu -security/ESM)
+  include_security: true
+  # zusätzlich ${distro_codename}-updates
+  include_updates: true
+  # Point-Releases (Debian label=Debian bzw. Ubuntu Hauptarchiv ${distro_codename})
+  include_point_releases: true
+  # weitere Origins, z. B. "site=ftp.ripe.net" oder "origin=deb.nodesource.com"
+  origins_pattern: []
+  # Python-Regex, Pakete die nie automatisch aktualisiert werden
+  package_blacklist: []
+
+  # --- Verhalten ---
+  minimal_steps: true
+  dpkg_force_confold: true
+  remove_unused_dependencies: true
+  remove_unused_kernel_packages: true
+  autoclean_interval: 7
+
+  # --- Mail (leer = aus) ---
+  mail: ""
+  mail_report: "only-on-error"   # always | on-change | only-on-error
+
+  # --- Reboot ---
+  # none        = nie automatisch rebooten (nur /run/reboot-required wird gesetzt)
+  # unattended  = Unattended-Upgrade::Automatic-Reboot zur Uhrzeit reboot_time
+  reboot_mode: "unattended"
+  reboot_with_users: false
+  reboot_time: "01:00"
+
+  # --- Timer (systemd OnCalendar): Upgrade um 0, 6, 12, 18 Uhr, Update 60 Min. vorher ---
+  timer_update: "*-*-* 23,05,11,17:00"
+  timer_upgrade: "*-*-* 00/6:00"
+  timer_randomized_delay: "0"

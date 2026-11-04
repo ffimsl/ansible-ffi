@@ -1,0 +1,8 @@
+---
+_uu_allowed_reboot_modes:
+  - none
+  - unattended
+_uu_allowed_mail_reports:
+  - always
+  - on-change
+  - only-on-error
