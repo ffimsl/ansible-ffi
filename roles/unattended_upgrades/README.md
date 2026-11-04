@@ -8,7 +8,7 @@ Was die Rolle verwaltet:
 
 | Datei | Zweck |
 |---|---|
-| `/etc/apt/apt.conf.d/20auto-upgrades` | Aktivierung (wie `dpkg-reconfigure -plow unattended-upgrades`) |
+| `/etc/apt/apt.conf.d/20auto-upgrades` | Aktivierung (wie `dpkg-reconfigure -plow unattended-upgrades`). Die Intervalle stehen auf `always`, weil die Timer mehrmals täglich laufen. Bei `1` würde apt nur den ersten Lauf pro Tag ausführen. |
 | `/etc/apt/apt.conf.d/52unattended-upgrades-local` | Quellen, Verhalten, Mail, Reboot |
 | `/etc/systemd/system/apt-daily{,-upgrade}.timer.d/override.conf` | Zeitpunkt von Update und Upgrade |
 
@@ -38,8 +38,8 @@ Alles über **ein Dict `unattended_upgrades`**. Es müssen nur die Keys angegebe
 | `reboot_mode` | `unattended` | `none` oder `unattended` (siehe unten) |
 | `reboot_with_users` | `false` | Reboot auch bei angemeldeten Benutzern (nur `unattended`) |
 | `reboot_time` | `01:00` | Uhrzeit für `unattended` |
-| `timer_update` | `*-*-* 02:30` | `OnCalendar` von `apt-daily.timer` |
-| `timer_upgrade` | `*-*-* 03:30` | `OnCalendar` von `apt-daily-upgrade.timer` |
+| `timer_update` | `*-*-* 23,05,11,17:00` | `OnCalendar` von `apt-daily.timer` |
+| `timer_upgrade` | `*-*-* 00/6:00` | `OnCalendar` von `apt-daily-upgrade.timer` |
 | `timer_randomized_delay` | `"0"` | `RandomizedDelaySec` beider Timer |
 
 ### Reboot-Modi
